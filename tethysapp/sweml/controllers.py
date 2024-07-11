@@ -1,74 +1,25 @@
-from django.shortcuts import render
+from tethys_sdk.layouts import MapLayout
 from tethys_sdk.routing import controller
-from tethys_sdk.gizmos import Button
+from .app import Sweml as app
 
-@controller
-def home(request):
-    """
-    Controller for the app home page.
-    """
-    save_button = Button(
-        display_text='',
-        name='save-button',
-        icon='save',
-        style='success',
-        attributes={
-            'data-bs-toggle':'tooltip',
-            'data-bs-placement':'top',
-            'title':'Save'
-        }
-    )
 
-    edit_button = Button(
-        display_text='',
-        name='edit-button',
-        icon='pen',
-        style='warning',
-        attributes={
-            'data-bs-toggle':'tooltip',
-            'data-bs-placement':'top',
-            'title':'Edit'
-        }
-    )
-
-    remove_button = Button(
-        display_text='',
-        name='remove-button',
-        icon='trash',
-        style='danger',
-        attributes={
-            'data-bs-toggle':'tooltip',
-            'data-bs-placement':'top',
-            'title':'Remove'
-        }
-    )
-
-    previous_button = Button(
-        display_text='Previous',
-        name='previous-button',
-        attributes={
-            'data-bs-toggle':'tooltip',
-            'data-bs-placement':'top',
-            'title':'Previous'
-        }
-    )
-
-    next_button = Button(
-        display_text='Next',
-        name='next-button',
-        attributes={
-            'data-bs-toggle':'tooltip',
-            'data-bs-placement':'top',
-            'title':'Next'
-        }
-    )
-
-    context = {
-        'save_button': save_button,
-        'edit_button': edit_button,
-        'remove_button': remove_button,
-        'previous_button': previous_button,
-        'next_button': next_button
-    }
-
-    return render(request, 'sweml/home.html', context)
+#Controller base configurations
+BASEMAPS = [
+        {'ESRI': {'layer':'NatGeo_World_Map'}},
+        {'ESRI': {'layer':'World_Street_Map'}},
+        {'ESRI': {'layer':'World_Imagery'}},
+        {'ESRI': {'layer':'World_Shaded_Relief'}},
+        {'ESRI': {'layer':'World_Topo_Map'}},
+        'OpenStreetMap',      
+    ]
+MAX_ZOOM = 16
+MIN_ZOOM = 1
+@controller(name="home", app_workspace=True)
+class swe(MapLayout):
+    app = app
+    base_template = 'sweml/base.html'
+    map_title = 'SWE'
+    map_subtitle = 'SWE 1-km Predictions'
+    basemaps = BASEMAPS
+    max_zoom = MAX_ZOOM
+    min_zoom = MIN_ZOOM
