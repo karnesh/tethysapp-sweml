@@ -1,7 +1,40 @@
+import json
+from pathlib import Path
+import pandas as pd
+import geopandas as gpd
+
 from tethys_sdk.layouts import MapLayout
 from tethys_sdk.routing import controller
 from .app import Sweml as app
 
+#functions to load AWS data
+import boto3
+import os
+from botocore import UNSIGNED 
+from botocore.client import Config
+import os
+os.environ['AWS_NO_SIGN_REQUEST'] = 'YES'
+
+#Set Global Variables
+
+try:
+    ACCESS_KEY_ID = app.get_custom_setting('Access_key_ID')
+    ACCESS_KEY_SECRET = app.get_custom_setting('Secret_access_key')
+except Exception:
+    ACCESS_KEY_ID = ''
+    ACCESS_KEY_SECRET = ''
+
+#AWS Data Connectivity
+#start session
+SESSION = boto3.Session(
+    aws_access_key_id=ACCESS_KEY_ID,
+    aws_secret_access_key=ACCESS_KEY_SECRET
+)
+s3 = SESSION.resource('s3')
+
+BUCKET_NAME = 'national-snow-model'
+BUCKET = s3.Bucket(BUCKET_NAME) 
+S3 = boto3.resource('s3', config=Config(signature_version=UNSIGNED))
 
 # Controller base configurations
 basemaps = [
