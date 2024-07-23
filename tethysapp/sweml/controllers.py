@@ -5,15 +5,14 @@ from tethys_sdk.layouts import MapLayout
 from tethys_sdk.routing import controller
 from .app import Sweml as app
 
-#functions to load AWS data
+# functions to load AWS data
 import boto3
-import os
 from botocore import UNSIGNED 
 from botocore.client import Config
 import os
 os.environ['AWS_NO_SIGN_REQUEST'] = 'YES'
 
-#Set Global Variables
+# Set Global Variables
 
 try:
     ACCESS_KEY_ID = app.get_custom_setting('Access_key_ID')
@@ -22,8 +21,8 @@ except Exception:
     ACCESS_KEY_ID = ''
     ACCESS_KEY_SECRET = ''
 
-#AWS Data Connectivity
-#start session
+# AWS Data Connectivity
+# start session
 SESSION = boto3.Session(
     aws_access_key_id=ACCESS_KEY_ID,
     aws_secret_access_key=ACCESS_KEY_SECRET
@@ -92,3 +91,38 @@ class swe(MapLayout):
         ]
 
         return layer_groups
+
+    @classmethod
+    def get_vector_style_map(cls):
+        return {
+            'Point': {'ol.style.Style': {
+                'image': {'ol.style.Circle': {
+                    'radius': 5,
+                    'fill': {'ol.style.Fill': {
+                        'color': 'white',
+                    }},
+                    'stroke': {'ol.style.Stroke': {
+                        'color': 'red',
+                        'width': 3
+                    }}
+                }}
+            }},
+            'MultiPolygon': {'ol.style.Style': {
+                'stroke': {'ol.style.Stroke': {
+                    'color': 'navy',
+                    'width': 3
+                }},
+                'fill': {'ol.style.Fill': {
+                    'color': 'rgba(0, 25, 128, 0.1)'
+                }}
+            }},
+            'MultiLineString': {'ol.style.Style': {
+                'stroke': {'ol.style.Stroke': {
+                    'color': 'navy',
+                    'width': 2
+                }},
+                'fill': {'ol.style.Fill': {
+                    'color': 'rgba(0, 25, 128, 0.1)'
+                }}
+            }},
+        }
