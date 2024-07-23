@@ -62,7 +62,7 @@ class swe(MapLayout):
         Add layers to the MapLayout and create associated layer group objects.
         """
         # Load GeoJSON from files
-        config_directory = Path(app_workspace.path) / 'sweml' / 'geojson'
+        config_directory = Path(app_workspace.path) / 'swe' / 'geojson'
 
         # Nexus Points
         swe_path = config_directory / 'SWE_2022-10-08.geojson'
