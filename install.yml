@@ -13,6 +13,8 @@ requirements:
       - conda-forge
     packages:
       - pandas
+      - geopandas
+      - boto3
 
   pip:
 
