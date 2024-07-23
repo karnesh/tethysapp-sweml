@@ -95,31 +95,10 @@ class swe(MapLayout):
     @classmethod
     def get_vector_style_map(cls):
         return {
-            'Point': {'ol.style.Style': {
-                'image': {'ol.style.Circle': {
-                    'radius': 5,
-                    'fill': {'ol.style.Fill': {
-                        'color': 'white',
-                    }},
-                    'stroke': {'ol.style.Stroke': {
-                        'color': 'red',
-                        'width': 3
-                    }}
-                }}
-            }},
-            'MultiPolygon': {'ol.style.Style': {
+            'Polygon': {'ol.style.Style': {
                 'stroke': {'ol.style.Stroke': {
                     'color': 'navy',
                     'width': 3
-                }},
-                'fill': {'ol.style.Fill': {
-                    'color': 'rgba(0, 25, 128, 0.1)'
-                }}
-            }},
-            'MultiLineString': {'ol.style.Style': {
-                'stroke': {'ol.style.Stroke': {
-                    'color': 'navy',
-                    'width': 2
                 }},
                 'fill': {'ol.style.Fill': {
                     'color': 'rgba(0, 25, 128, 0.1)'
