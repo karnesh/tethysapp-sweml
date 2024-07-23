@@ -1,7 +1,5 @@
 import json
 from pathlib import Path
-import pandas as pd
-import geopandas as gpd
 
 from tethys_sdk.layouts import MapLayout
 from tethys_sdk.routing import controller
@@ -58,3 +56,39 @@ class swe(MapLayout):
     basemaps = basemaps
     max_zoom = max_zoom
     min_zoom = min_zoom
+
+    def compose_layers(self, request, map_view, app_workspace, *args, **kwargs):
+        """
+        Add layers to the MapLayout and create associated layer group objects.
+        """
+        # Load GeoJSON from files
+        config_directory = Path(app_workspace.path) / 'sweml' / 'geojson'
+
+        # Nexus Points
+        swe_path = config_directory / 'SWE_2022-10-08.geojson'
+        with open(swe_path) as nf:
+            swe_geojson = json.loads(nf.read())
+
+        swe_layer = self.build_geojson_layer(
+            geojson=swe_geojson,
+            layer_name='SWE',
+            layer_title='SWE 1-km',
+            layer_variable='swe',
+            visible=True,
+            selectable=True,
+            plottable=True,
+        )
+
+        # Create layer groups
+        layer_groups = [
+            self.build_layer_group(
+                id='sweml',
+                display_name='SWE 1-km',
+                layer_control='checkbox',  # 'checkbox' or 'radio'
+                layers=[
+                    swe_layer,
+                ]
+            )
+        ]
+
+        return layer_groups
