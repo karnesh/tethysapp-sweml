@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-
+import pandas as pd
 from tethys_sdk.layouts import MapLayout
 from tethys_sdk.routing import controller
 from .app import Sweml as app
@@ -45,6 +45,7 @@ basemaps = [
 max_zoom = 16
 min_zoom = 1
 
+MODEL_OUTPUT_FOLDER_NAME = 'swe'
 
 @controller(name="home", app_workspace=True)
 class swe(MapLayout):
@@ -55,13 +56,15 @@ class swe(MapLayout):
     basemaps = basemaps
     max_zoom = max_zoom
     min_zoom = min_zoom
+    show_properties_popup = True
+    plot_slide_sheet = True
 
     def compose_layers(self, request, map_view, app_workspace, *args, **kwargs):
         """
         Add layers to the MapLayout and create associated layer group objects.
         """
         # Load GeoJSON from files
-        config_directory = Path(app_workspace.path) / 'swe' / 'geojson'
+        config_directory = Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / 'geojson'
 
         # Nexus Points
         swe_path = config_directory / 'SWE_2022-10-08.geojson'
@@ -105,3 +108,54 @@ class swe(MapLayout):
                 }}
             }},
         }
+
+    def get_plot_for_layer_feature(self, request, layer_name, feature_id, layer_data, feature_props, app_workspace,
+                                   *args, **kwargs):
+        """
+        Retrieves plot data for given feature on given layer.
+
+        Args:
+            layer_name (str): Name/id of layer.
+            feature_id (str): ID of feature.
+            layer_data (dict): The MVLayer.data dictionary.
+            feature_props (dict): The properties of the selected feature.
+
+        Returns:
+            str, list<dict>, dict: plot title, data series, and layout options, respectively.
+        """
+        output_directory = Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / 'outputs'
+
+        # Get the feature id
+        id = feature_props.get('id')
+
+        # Nexus
+        if layer_name == 'SWE':
+            layout = {
+                'yaxis': {
+                    'title': 'SWE 1-km'
+                }
+            }
+
+            output_path = output_directory / f'{id}_output.csv'
+            if not output_path.exists():
+                print(f'WARNING: no such file {output_path}')
+                return f'No Data Found for SWE "{id}"', [], layout
+
+            # Parse with Pandas
+            df = pd.read_csv(output_path)
+            time_col = df.iloc[:, 1]
+            swe_col = df.iloc[:, 2]
+            data = [
+                {
+                    'name': 'Streamflow',
+                    'mode': 'lines',
+                    'x': time_col.tolist(),
+                    'y': swe_col.tolist(),
+                    'line': {
+                        'width': 2,
+                        'color': 'blue'
+                    }
+                },
+            ]
+
+            return f'SWE "{id}"', data, layout
