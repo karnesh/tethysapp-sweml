@@ -10,3 +10,4 @@
 .idea/
 services.yml
 *.geojson
+*.csv
