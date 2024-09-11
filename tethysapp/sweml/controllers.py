@@ -126,7 +126,7 @@ class swe(MapLayout):
         output_directory = Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / 'outputs'
 
         # Get the feature id
-        id = feature_props.get('id')
+        id = feature_props.get('geoid')
 
         # Nexus
         if layer_name == 'SWE':
@@ -136,18 +136,18 @@ class swe(MapLayout):
                 }
             }
 
-            output_path = output_directory / f'{id}_output.csv'
+            output_path = output_directory / f'swe_geoid_{id}.csv'
             if not output_path.exists():
                 print(f'WARNING: no such file {output_path}')
                 return f'No Data Found for SWE "{id}"', [], layout
 
             # Parse with Pandas
             df = pd.read_csv(output_path)
-            time_col = df.iloc[:, 1]
-            swe_col = df.iloc[:, 2]
+            time_col = df.iloc[:, 0]
+            swe_col = df.iloc[:, 1]
             data = [
                 {
-                    'name': 'Streamflow',
+                    'name': 'SWE',
                     'mode': 'lines',
                     'x': time_col.tolist(),
                     'y': swe_col.tolist(),
