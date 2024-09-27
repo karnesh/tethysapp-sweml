@@ -67,7 +67,7 @@ class swe(MapLayout):
         config_directory = Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / 'geojson'
 
         # Nexus Points
-        swe_path = config_directory / 'SWE_2022-10-08.geojson'
+        swe_path = config_directory / 'SWE_2024-07-12.geojson'
         with open(swe_path) as nf:
             swe_geojson = json.loads(nf.read())
 
@@ -123,10 +123,11 @@ class swe(MapLayout):
         Returns:
             str, list<dict>, dict: plot title, data series, and layout options, respectively.
         """
-        output_directory = Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / 'outputs'
+        output_directory = Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / 'geojson'
 
         # Get the feature id
-        id = feature_props.get('geoid')
+        x = feature_props.get('x')
+        y = feature_props.get('y')
 
         # Nexus
         if layer_name == 'SWE':
@@ -136,7 +137,7 @@ class swe(MapLayout):
                 }
             }
 
-            output_path = output_directory / f'swe_geoid_{id}.csv'
+            output_path = output_directory / f'swe_{x}_{y}.csv'
             if not output_path.exists():
                 print(f'WARNING: no such file {output_path}')
                 return f'No Data Found for SWE "{id}"', [], layout
