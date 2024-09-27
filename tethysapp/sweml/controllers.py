@@ -137,10 +137,10 @@ class swe(MapLayout):
                 }
             }
 
-            output_path = output_directory / f'swe_{x}_{y}.csv'
+            output_path = output_directory / f'swe_{x:.2f}_{y:.2f}.csv'
             if not output_path.exists():
                 print(f'WARNING: no such file {output_path}')
-                return f'No Data Found for SWE "{id}"', [], layout
+                return f'No Data Found for SWE at X: {x:.2f} Y: {y:.2f}', [], layout
 
             # Parse with Pandas
             df = pd.read_csv(output_path)
@@ -159,4 +159,4 @@ class swe(MapLayout):
                 },
             ]
 
-            return f'SWE "{id}"', data, layout
+            return f'SWE at X: {x:.2f} Y: {y:.2f}', data, layout
