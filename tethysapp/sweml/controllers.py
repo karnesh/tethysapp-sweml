@@ -81,12 +81,12 @@ class swe(MapLayout):
             name='date',
             display_text='Date',
             autoclose=False,
-            format='mm-dd-yyyy',
-            start_date='01-01-2023',
-            end_date='12-30-2024',
+            format='yyyy-mm-dd',
+            start_date='2022-01-01',
+            end_date='2024-12-30',
             start_view='year',
             today_button=False,
-            initial='01-01-2023'
+            initial='2022-01-01'
         )
 
         # Call Super   
