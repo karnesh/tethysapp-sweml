@@ -86,7 +86,7 @@ class swe(MapLayout):
             end_date='2024-12-30',
             start_view='year',
             today_button=False,
-            initial='2022-10-08'
+            initial='2024-07-12'
         )
 
         # Call Super   
@@ -105,42 +105,70 @@ class swe(MapLayout):
         # Load GeoJSON from files
         config_directory = Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / 'geojson'
 
-        # http request for user inputs
-        date = request.GET.get('date')
-        
-        if not date:
-            print('No inputs, going to defaults')
-            # put in some defaults
-            date = '2024-07-12'
-        
-        file = f'SWE_{date}.geojson'
-        print(date, file)
-        # Nexus Points
-        swe_path = config_directory / file
-        with open(swe_path) as nf:
-            swe_geojson = json.loads(nf.read())
+        try:
+            # http request for user inputs
+            date = request.GET.get('date')
 
-        swe_layer = self.build_geojson_layer(
-            geojson=swe_geojson,
-            layer_name='SWE',
-            layer_title='SWE 1-km',
-            layer_variable='swe',
-            visible=True,
-            selectable=True,
-            plottable=True,
-        )
+            file = f'SWE_{date}.geojson'
 
-        # Create layer groups
-        layer_groups = [
-            self.build_layer_group(
-                id='sweml',
-                display_name='SWE 1-km',
-                layer_control='checkbox',  # 'checkbox' or 'radio'
-                layers=[
-                    swe_layer,
-                ]
+            # Nexus Points
+            swe_path = config_directory / file
+            with open(swe_path) as nf:
+                swe_geojson = json.loads(nf.read())
+
+            swe_layer = self.build_geojson_layer(
+                geojson=swe_geojson,
+                layer_name='SWE',
+                layer_title='SWE 1-km',
+                layer_variable='swe',
+                visible=True,
+                selectable=True,
+                plottable=True,
             )
-        ]
+
+            # Create layer groups
+            layer_groups = [
+                self.build_layer_group(
+                    id='sweml',
+                    display_name='SWE 1-km',
+                    layer_control='checkbox',  # 'checkbox' or 'radio'
+                    layers=[
+                        swe_layer,
+                    ]
+                )
+            ]
+
+        except:
+            date = '2024-07-12'
+
+            file = f'SWE_{date}.geojson'
+
+            # Nexus Points
+            swe_path = config_directory / file
+            with open(swe_path) as nf:
+                swe_geojson = json.loads(nf.read())
+
+            swe_layer = self.build_geojson_layer(
+                geojson=swe_geojson,
+                layer_name='SWE',
+                layer_title='SWE 1-km',
+                layer_variable='swe',
+                visible=True,
+                selectable=True,
+                plottable=True,
+            )
+
+            # Create layer groups
+            layer_groups = [
+                self.build_layer_group(
+                    id='sweml',
+                    display_name='SWE 1-km',
+                    layer_control='checkbox',  # 'checkbox' or 'radio'
+                    layers=[
+                        swe_layer,
+                    ]
+                )
+            ]
 
         return layer_groups
 
