@@ -5,6 +5,9 @@ from tethys_sdk.layouts import MapLayout
 from tethys_sdk.routing import controller
 from .app import Sweml as app
 
+#Date picker
+from tethys_sdk.gizmos import DatePicker
+
 # functions to load AWS data
 import boto3
 from botocore import UNSIGNED 
@@ -47,7 +50,9 @@ min_zoom = 1
 
 MODEL_OUTPUT_FOLDER_NAME = 'swe'
 
-@controller(name="home", app_workspace=True)
+@controller(name="swe", 
+            url="swe/",
+            app_workspace=True)
 class swe(MapLayout):
     app = app
     base_template = 'sweml/base.html'
@@ -58,6 +63,40 @@ class swe(MapLayout):
     min_zoom = min_zoom
     show_properties_popup = True
     plot_slide_sheet = True
+    template_name = 'sweml/swe.html'
+
+    def get_context(self, request, *args, **kwargs):
+        """
+        Create context for the Map Layout view, with an override for the map extents based on date.
+
+        Args:
+            request (HttpRequest): The request.
+            context (dict): The context dictionary.
+
+        Returns:
+            dict: modified context dictionary.
+        """
+
+        date_picker = DatePicker(
+            name='date',
+            display_text='Date',
+            autoclose=False,
+            format='mm-dd-yyyy',
+            start_date='01-01-2023',
+            end_date='12-30-2024',
+            start_view='year',
+            today_button=False,
+            initial='01-01-2023'
+        )
+
+        # Call Super   
+        context = super().get_context(
+            request,
+            *args,
+            **kwargs
+        )
+        context['date_picker'] = date_picker
+        return context
 
     def compose_layers(self, request, map_view, app_workspace, *args, **kwargs):
         """
@@ -137,10 +176,10 @@ class swe(MapLayout):
                 }
             }
 
-            output_path = output_directory / f'swe_{x:.2f}_{y:.2f}.csv'
+            output_path = output_directory / f'swe_1000m_{y:.3f}_{x:.3f}.csv'
             if not output_path.exists():
                 print(f'WARNING: no such file {output_path}')
-                return f'No Data Found for SWE at X: {x:.2f} Y: {y:.2f}', [], layout
+                return f'No Data Found for SWE at Lat: {y:.3f} Lon: {x:.3f}', [], layout
 
             # Parse with Pandas
             df = pd.read_csv(output_path)
@@ -159,4 +198,4 @@ class swe(MapLayout):
                 },
             ]
 
-            return f'SWE at X: {x:.2f} Y: {y:.2f}', data, layout
+            return f'SWE at Lat: {y:.3f} Lon: {x:.3f}', data, layout
