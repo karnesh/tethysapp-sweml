@@ -10,9 +10,10 @@ from tethys_sdk.gizmos import DatePicker
 
 # functions to load AWS data
 import boto3
-from botocore import UNSIGNED 
+from botocore import UNSIGNED
 from botocore.client import Config
 import os
+
 os.environ['AWS_NO_SIGN_REQUEST'] = 'YES'
 
 # Set Global Variables
@@ -33,24 +34,25 @@ SESSION = boto3.Session(
 s3 = SESSION.resource('s3')
 
 BUCKET_NAME = 'national-snow-model'
-BUCKET = s3.Bucket(BUCKET_NAME) 
+BUCKET = s3.Bucket(BUCKET_NAME)
 S3 = boto3.resource('s3', config=Config(signature_version=UNSIGNED))
 
 # Controller base configurations
 basemaps = [
-        {'ESRI': {'layer':'NatGeo_World_Map'}},
-        {'ESRI': {'layer':'World_Street_Map'}},
-        {'ESRI': {'layer':'World_Imagery'}},
-        {'ESRI': {'layer':'World_Shaded_Relief'}},
-        {'ESRI': {'layer':'World_Topo_Map'}},
-        'OpenStreetMap',      
-    ]
+    {'ESRI': {'layer': 'NatGeo_World_Map'}},
+    {'ESRI': {'layer': 'World_Street_Map'}},
+    {'ESRI': {'layer': 'World_Imagery'}},
+    {'ESRI': {'layer': 'World_Shaded_Relief'}},
+    {'ESRI': {'layer': 'World_Topo_Map'}},
+    'OpenStreetMap',
+]
 max_zoom = 16
 min_zoom = 1
 
 MODEL_OUTPUT_FOLDER_NAME = 'swe'
 
-@controller(name="swe", 
+
+@controller(name="swe",
             url="swe/",
             app_workspace=True)
 class swe(MapLayout):
@@ -89,7 +91,7 @@ class swe(MapLayout):
             initial='2024-07-12'
         )
 
-        # Call Super   
+        # Call Super
         context = super().get_context(
             request,
             *args,
