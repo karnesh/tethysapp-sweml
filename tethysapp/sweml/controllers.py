@@ -82,6 +82,7 @@ class swe(MapLayout):
             **kwargs
         )
         context['date_picker'] = date_picker
+
         return context
 
     def compose_layers(self, request, map_view, app_workspace, *args, **kwargs):
@@ -187,13 +188,14 @@ class swe(MapLayout):
         Returns:
             str, list<dict>, dict: plot title, data series, and layout options, respectively.
         """
-        output_directory = Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / 'geojson'
+
+        csv_directory = "Neural_Network/Hold_Out_Year/Daily/csv"
 
         # Get the feature id
         x = feature_props.get('x')
         y = feature_props.get('y')
 
-        # Nexus
+        # SWE
         if layer_name == 'SWE':
             layout = {
                 'yaxis': {
@@ -201,13 +203,17 @@ class swe(MapLayout):
                 }
             }
 
-            output_path = output_directory / f'swe_1000m_{y:.3f}_{x:.3f}.csv'
-            if not output_path.exists():
-                print(f'WARNING: no such file {output_path}')
+            file = f'swe_1000m_{y:.3f}_{x:.3f}.csv'
+            file_path = f'{csv_directory}/{file}'
+            file_object = s3.Object(BUCKET_NAME, file_path)
+            file_content = file_object.get()['Body']
+
+            if not file_content:
+                print(f'WARNING: no such file {file_path}')
                 return f'No Data Found for SWE at Lat: {y:.3f} Lon: {x:.3f}', [], layout
 
             # Parse with Pandas
-            df = pd.read_csv(output_path)
+            df = pd.read_csv(file_content)
             time_col = df.iloc[:, 0]
             swe_col = df.iloc[:, 1]
             data = [
