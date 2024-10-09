@@ -18,24 +18,8 @@ os.environ['AWS_NO_SIGN_REQUEST'] = 'YES'
 
 # Set Global Variables
 
-try:
-    ACCESS_KEY_ID = app.get_custom_setting('Access_key_ID')
-    ACCESS_KEY_SECRET = app.get_custom_setting('Secret_access_key')
-except Exception:
-    ACCESS_KEY_ID = ''
-    ACCESS_KEY_SECRET = ''
-
-# AWS Data Connectivity
-# start session
-SESSION = boto3.Session(
-    aws_access_key_id=ACCESS_KEY_ID,
-    aws_secret_access_key=ACCESS_KEY_SECRET
-)
-s3 = SESSION.resource('s3')
-
 BUCKET_NAME = 'national-snow-model'
-BUCKET = s3.Bucket(BUCKET_NAME)
-S3 = boto3.resource('s3', config=Config(signature_version=UNSIGNED))
+s3 = boto3.resource('s3', config=Config(signature_version=UNSIGNED))
 
 # Controller base configurations
 basemaps = [
@@ -107,16 +91,17 @@ class swe(MapLayout):
         # Load GeoJSON from files
         config_directory = Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / 'geojson'
 
+        geojson_directory = "Neural_Network/Hold_Out_Year/Daily/GeoJSON"
+
         try:
             # http request for user inputs
             date = request.GET.get('date')
 
             file = f'SWE_{date}.geojson'
-
-            # Nexus Points
-            swe_path = config_directory / file
-            with open(swe_path) as nf:
-                swe_geojson = json.loads(nf.read())
+            file_path = f'{geojson_directory}/{file}'
+            file_object = s3.Object(BUCKET_NAME, file_path)
+            file_content = file_object.get()['Body'].read().decode('utf-8')
+            swe_geojson = json.loads(file_content)
 
             swe_layer = self.build_geojson_layer(
                 geojson=swe_geojson,
@@ -140,7 +125,7 @@ class swe(MapLayout):
                 )
             ]
 
-        except:
+        except Exception as e:
             date = '2024-07-12'
 
             file = f'SWE_{date}.geojson'
