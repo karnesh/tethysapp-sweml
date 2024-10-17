@@ -72,7 +72,7 @@ class swe(MapLayout):
             end_date='2024-12-30',
             start_view='year',
             today_button=False,
-            initial='2024-06-15'
+            initial='2024-07-12'
         )
 
         # Call Super
