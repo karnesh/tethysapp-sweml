@@ -68,7 +68,7 @@ class swe(MapLayout):
             display_text='Date',
             autoclose=False,
             format='yyyy-mm-dd',
-            start_date='2023-01-01',
+            start_date='2022-10-01',
             end_date='2024-12-30',
             start_view='year',
             today_button=False,
@@ -118,7 +118,7 @@ class swe(MapLayout):
             layer_groups = [
                 self.build_layer_group(
                     id='sweml',
-                    display_name='SWE 1-km',
+                    display_name=date,
                     layer_control='checkbox',  # 'checkbox' or 'radio'
                     layers=[
                         swe_layer,
@@ -150,7 +150,7 @@ class swe(MapLayout):
             layer_groups = [
                 self.build_layer_group(
                     id='sweml',
-                    display_name='SWE 1-km',
+                    display_name=date,
                     layer_control='checkbox',  # 'checkbox' or 'radio'
                     layers=[
                         swe_layer,
