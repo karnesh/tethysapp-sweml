@@ -199,7 +199,7 @@ class swe(MapLayout):
         if layer_name == 'SWE':
             layout = {
                 'yaxis': {
-                    'title': 'SWE 1-km'
+                    'title': 'SWE 1-km in inches'
                 }
             }
 
