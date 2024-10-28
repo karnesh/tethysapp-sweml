@@ -1,3 +1,4 @@
+import datetime
 import json
 from pathlib import Path
 import pandas as pd
@@ -107,7 +108,7 @@ class swe(MapLayout):
             swe_layer = self.build_geojson_layer(
                 geojson=swe_geojson,
                 layer_name='SWE',
-                layer_title='SWE 1-km',
+                layer_title=date,
                 layer_variable='swe',
                 visible=True,
                 selectable=True,
@@ -118,7 +119,7 @@ class swe(MapLayout):
             layer_groups = [
                 self.build_layer_group(
                     id='sweml',
-                    display_name=date,
+                    display_name='SWE 1-km',
                     layer_control='checkbox',  # 'checkbox' or 'radio'
                     layers=[
                         swe_layer,
@@ -139,7 +140,7 @@ class swe(MapLayout):
             swe_layer = self.build_geojson_layer(
                 geojson=swe_geojson,
                 layer_name='SWE',
-                layer_title='SWE 1-km',
+                layer_title=date,
                 layer_variable='swe',
                 visible=True,
                 selectable=True,
@@ -150,7 +151,7 @@ class swe(MapLayout):
             layer_groups = [
                 self.build_layer_group(
                     id='sweml',
-                    display_name=date,
+                    display_name='SWE 1-km',
                     layer_control='checkbox',  # 'checkbox' or 'radio'
                     layers=[
                         swe_layer,
@@ -194,6 +195,13 @@ class swe(MapLayout):
         # Get the feature id
         x = feature_props.get('x')
         y = feature_props.get('y')
+        date = datetime.datetime.strptime(layer_data['popup_title'], '%Y-%m-%d')
+        if date.month >= 10:
+            start_date = pd.to_datetime(datetime.date(date.year, 10, 1))
+            end_date = pd.to_datetime(datetime.date(date.year+1, 9, 30))
+        else:
+            start_date = pd.to_datetime(datetime.date(date.year-1, 10, 1))
+            end_date = pd.to_datetime(datetime.date(date.year, 9, 30))
 
         # SWE
         if layer_name == 'SWE':
@@ -214,6 +222,9 @@ class swe(MapLayout):
 
             # Parse with Pandas
             df = pd.read_csv(file_content)
+            df.date = pd.to_datetime(df.date)
+            mask = (df['date'] > start_date) & (df['date'] <= end_date)
+            df = df.loc[mask]
             time_col = df.iloc[:, 0]
             swe_col = df.iloc[:, 1]
             data = [
