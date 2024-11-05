@@ -12,4 +12,9 @@ $(function() { //wait for page to load
         }
     });
     
+    swe_layer.setStyle(new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'green'
+        }),
+    }));
 });
