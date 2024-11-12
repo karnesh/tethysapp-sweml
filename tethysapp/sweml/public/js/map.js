@@ -28,79 +28,7 @@ $(function() { //wait for page to load
 function setFeatureColor(feature) {
     let swe = feature.A.SWE;
     let opacity = 0.8;
-
-    let key = Math.floor(swe/5)*5+5;
-    let color 
     
-    switch(key){
-        case 0:
-            color = 'rgba(0, 0, 0, 0)';
-            break;
-        case 5:
-            color = `rgba(248, 248, 248, ${opacity})`;
-            break;
-        case 10:
-            color = `rgba(221, 221, 248, ${opacity})`;
-            break;
-        case 15:
-            color = `rgba(194, 194, 248, ${opacity})`;
-            break;
-        case 20:
-            color = `rgba(167, 167, 248, ${opacity})`;
-            break;
-        case 25:
-            color = `rgba(140, 140, 248, ${opacity})`;
-            break;
-        case 30:
-            color = `rgba(113, 113, 248, ${opacity})`;
-            break;
-        case 35:
-            color = `rgba(86, 86, 248, ${opacity})`;
-            break;
-        case 40:
-            color = `rgba(59, 59, 248, ${opacity})`;
-            break;
-        case 45:
-            color = `rgba(30, 30, 248, ${opacity})`;
-            break;
-        case 50:
-            color = `rgba(0, 0, 248, ${opacity})`;
-            break;
-        case 55:
-            color = `rgba(140, 140, 248, ${opacity})`;
-            break;
-        case 60:
-            color = 'rgba(0, 0, 0, 0)';
-            break;
-        case 65:
-            color = `rgba(248, 248, 248, ${opacity})`;
-            break;
-        case 70:
-            color = `rgba(221, 221, 248, ${opacity})`;
-            break;
-        case 75:
-            color = `rgba(194, 194, 248, ${opacity})`;
-            break;
-        case 80:
-            color = `rgba(167, 167, 248, ${opacity})`;
-            break;
-        case 85:
-            color = `rgba(140, 140, 248, ${opacity})`;
-            break;
-        case 90:
-            color = `rgba(113, 113, 248, ${opacity})`;
-            break;
-        case 95:
-            color = `rgba(86, 86, 248, ${opacity})`;
-            break;
-        case 100:
-            color = `rgba(59, 59, 248, ${opacity})`;
-            break;
-    }
-    
-    return color;
-        
-    /*
     const color_dict = {
         0: 'rgba(0, 0, 0, 0)',
         5: `rgba(248, 248, 248, ${opacity})`,
@@ -125,8 +53,21 @@ function setFeatureColor(feature) {
         100: `rgba(33, 102, 172, ${opacity})`
     };
     let key = Math.floor(swe/5)*5+5;
-    console.log(color_dict.key)
     
-    return color_dict.key;
-    */
+    return color_dict[key];
 }
+
+/*
+$(function() {  // Wait for page to load
+    // Map Click Event Handler
+    TETHYS_MAP_VIEW.mapClicked(function(coords) {
+        let popup_content = document.querySelector("#properties-popup-content");
+        let lat_lon = ol.proj.transform(coords, 'EPSG:3857', 'EPSG:4326');
+        let rounded_lat = Math.round(lat_lon[1] * 100) / 100;
+        let rounded_lon = Math.round(lat_lon[0] * 100) / 100;
+        popup_content.innerHTML = `<b>Coordinates:</b><p>${rounded_lat}, ${rounded_lon}</p>`;
+        MAP_LAYOUT.get_plot();
+        MAP_LAYOUT.show_plot();
+        })
+});
+*/
