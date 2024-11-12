@@ -16,9 +16,6 @@ from botocore import UNSIGNED
 from botocore.client import Config
 import os
 
-from tethys_gizmos.gizmo_options import MVLegendClass
-
-
 os.environ["AWS_NO_SIGN_REQUEST"] = "YES"
 
 # Set Global Variables
@@ -56,7 +53,6 @@ class swe(MapLayout):
     plot_slide_sheet = True
     template_name = "sweml/swe.html"
     show_legends = True
-    geojson_legends = []
 
     def get_context(self, request, *args, **kwargs):
         """
@@ -94,16 +90,16 @@ class swe(MapLayout):
         Add layers to the MapLayout and create associated layer group objects.
         """
         # Load GeoJSON from files
-        config_directory = (
-            Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / "geojson"
-        )
+        local_geojson_directory = Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / "geojson"
+
+        s3_geojson_directory = "Neural_Network/Hold_Out_Year/Daily/GeoJSON"
 
         try:
             # http request for user inputs
             date = request.GET.get("date")
 
             file = f"SWE_{date}.geojson"
-            file_path = f"{config_directory}/{file}"
+            file_path = f"{s3_geojson_directory}/{file}"
             file_object = s3.Object(BUCKET_NAME, file_path)
             file_content = file_object.get()["Body"].read().decode("utf-8")
             swe_geojson = json.loads(file_content)
@@ -145,7 +141,7 @@ class swe(MapLayout):
             file = f"SWE_{date}.geojson"
 
             # Nexus Points
-            swe_path = config_directory / file
+            swe_path = local_geojson_directory / file
             with open(swe_path) as nf:
                 swe_geojson = json.loads(nf.read())
 
@@ -192,17 +188,8 @@ class swe(MapLayout):
             },
         }
 
-    def get_plot_for_layer_feature(
-        self,
-        request,
-        layer_name,
-        feature_id,
-        layer_data,
-        feature_props,
-        app_workspace,
-        *args,
-        **kwargs,
-    ):
+    def get_plot_for_layer_feature(self, request, layer_name, feature_id, layer_data, feature_props, app_workspace, 
+                                   *args, **kwargs,):
         """
         Retrieves plot data for given feature on given layer.
 
