@@ -49,8 +49,11 @@ class swe(MapLayout):
     max_zoom = max_zoom
     min_zoom = min_zoom
     show_properties_popup = True
+    #show_map_clicks = True
+    #show_map_click_popup = True
     plot_slide_sheet = True
     template_name = 'sweml/swe.html'
+    show_legends = True
 
     def get_context(self, request, *args, **kwargs):
         """
@@ -113,6 +116,7 @@ class swe(MapLayout):
                 visible=True,
                 selectable=True,
                 plottable=True,
+                show_legend=True
             )
 
             # Create layer groups
@@ -145,6 +149,7 @@ class swe(MapLayout):
                 visible=True,
                 selectable=True,
                 plottable=True,
+                show_legend=True
             )
 
             # Create layer groups
