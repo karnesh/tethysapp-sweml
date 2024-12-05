@@ -2,6 +2,12 @@
 {% load static %}
 {% load tethys_gizmos %}
 
+{% block content_dependent_styles %}
+  {{ block.super }}
+  <link href="{% static 'sweml/css/main.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+
 {% block scripts %}
   {{ block.super }}
   <script src="{% static 'sweml/js/map.js' %}" type="text/javascript"></script>
@@ -19,4 +25,13 @@
         </a>
     </span>
 </form>
+{% endblock %}
+
+
+
+{% block app_content %}
+{{ block.super }}
+
+  <div id="legend" class="legend">
+  </div>
 {% endblock %}
