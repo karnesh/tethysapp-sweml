@@ -106,8 +106,10 @@ class swe(MapLayout):
 
             # this is to get the rounded SWE values
             gdf = gpd.GeoDataFrame.from_features(swe_geojson["features"])
-            # Round the 'SWE' column and create 'swe_value'
-            gdf["swe_value"] = gdf["SWE"].round(3)
+            gdf["SWE"] = gdf["SWE"].round(3)
+            gdf["x"] = gdf["x"].round(3)
+            gdf["y"] = gdf["y"].round(3)
+
             # convert back to geojson
             swe_geojson = json.loads(gdf.to_json())
 
@@ -120,7 +122,6 @@ class swe(MapLayout):
                 selectable=True,
                 plottable=True,
                 show_legend=True,
-                excluded_properties=["SWE"],
             )
 
             # Create layer groups
@@ -147,7 +148,10 @@ class swe(MapLayout):
 
             gdf = gpd.GeoDataFrame.from_features(swe_geojson["features"])
             # Round the 'SWE' column and create 'swe_value'
-            gdf["swe_value"] = gdf["SWE"].round(3)
+            gdf["SWE"] = gdf["SWE"].round(3)
+            gdf["x"] = gdf["x"].round(3)
+            gdf["y"] = gdf["y"].round(3)
+
             # convert back to geojson
             swe_geojson = json.loads(gdf.to_json())
 
@@ -160,7 +164,6 @@ class swe(MapLayout):
                 selectable=True,
                 plottable=True,
                 show_legend=True,
-                excluded_properties=["SWE"],
             )
 
             # Create layer groups
