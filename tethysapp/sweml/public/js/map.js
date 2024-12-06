@@ -1,4 +1,5 @@
 let opacity = 0.8;
+
 const color_dict = {
     0: 'rgba(0, 0, 0, 0)',
     5: `rgba(248, 248, 248, ${opacity})`,
@@ -11,16 +12,16 @@ const color_dict = {
     40: `rgba(59, 59, 248, ${opacity})`,
     45: `rgba(30, 30, 248, ${opacity})`,
     50: `rgba(0, 0, 248, ${opacity})`,
-    55: `rgba(33, 102, 172, ${opacity})`,
-    60: `rgba(33, 102, 172, ${opacity})`,
-    65: `rgba(33, 102, 172, ${opacity})`,
-    70: `rgba(33, 102, 172, ${opacity})`,
-    75: `rgba(33, 102, 172, ${opacity})`,
-    80: `rgba(33, 102, 172, ${opacity})`,
-    85: `rgba(33, 102, 172, ${opacity})`,
-    90: `rgba(33, 102, 172, ${opacity})`,
-    95: `rgba(33, 102, 172, ${opacity})`,
-    100: `rgba(33, 102, 172, ${opacity})`
+    55: `rgba(81, 40, 137, ${opacity})`,
+    60: `rgba(100, 45, 144, ${opacity})`,
+    65: `rgba(119, 51, 151, ${opacity})`,
+    70: `rgba(139, 56, 159, ${opacity})`,
+    75: `rgba(158, 62, 166, ${opacity})`,
+    80: `rgba(177, 67, 173, ${opacity})`,
+    85: `rgba(197, 73, 181, ${opacity})`,
+    90: `rgba(216, 78, 188, ${opacity})`,
+    95: `rgba(235, 84, 195, ${opacity})`,
+    100: `rgba(255, 90, 204, ${opacity})`
 };
 
 
