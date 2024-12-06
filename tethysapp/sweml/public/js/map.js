@@ -113,18 +113,3 @@ function createColorGradient(color_dict) {
     let gradientString = `linear-gradient(to right, ${gradientColors.join(', ')})`;
     return gradientString;
 }
-
-/*
-$(function() {  // Wait for page to load
-    // Map Click Event Handler
-    TETHYS_MAP_VIEW.mapClicked(function(coords) {
-        let popup_content = document.querySelector("#properties-popup-content");
-        let lat_lon = ol.proj.transform(coords, 'EPSG:3857', 'EPSG:4326');
-        let rounded_lat = Math.round(lat_lon[1] * 100) / 100;
-        let rounded_lon = Math.round(lat_lon[0] * 100) / 100;
-        popup_content.innerHTML = `<b>Coordinates:</b><p>${rounded_lat}, ${rounded_lon}</p>`;
-        MAP_LAYOUT.get_plot();
-        MAP_LAYOUT.show_plot();
-        })
-});
-*/
