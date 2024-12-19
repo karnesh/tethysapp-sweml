@@ -89,7 +89,7 @@ function createLegend() {
     let labelValues = [5, 20, 40, 60, 80, 100]; // Adjust label positions as needed
     for (let value of labelValues) {
         let label = document.createElement('div');
-        label.innerText = `${value} mm`;
+        label.innerText = `${value} in`;
         labelsDiv.appendChild(label);
     }
 
