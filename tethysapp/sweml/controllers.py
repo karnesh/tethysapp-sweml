@@ -148,7 +148,7 @@ class swe(MapLayout):
 
             gdf = gpd.GeoDataFrame.from_features(swe_geojson["features"])
             # Round the 'SWE' column and create 'swe_value'
-            gdf["SWE"] = gdf["SWE"].round(3)
+            gdf["SWE"] = gdf["SWE"].round(0)
             gdf["x"] = gdf["x"].round(3)
             gdf["y"] = gdf["y"].round(3)
 
