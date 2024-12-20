@@ -72,7 +72,7 @@ class swe(MapLayout):
             autoclose=False,
             format="yyyy-mm-dd",
             start_date="2022-10-01",
-            end_date="2024-12-30",
+            end_date="today",
             start_view="year",
             today_button=False,
             initial="2024-07-12",
