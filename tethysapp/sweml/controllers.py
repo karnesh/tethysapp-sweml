@@ -102,6 +102,9 @@ class swe(MapLayout):
             # http request for user inputs
             date = request.GET.get("date")
 
+            if not date:
+                date = datetime.datetime.today().strftime('%Y-%m-%d')
+
             file = f"SWE_{date}.geojson"
             file_path = f"{s3_geojson_directory}/{file}"
             file_object = s3.Object(BUCKET_NAME, file_path)
@@ -141,50 +144,8 @@ class swe(MapLayout):
             ]
 
         except:
-            """
-            date = "2024-07-12"
-
-            file = f"SWE_{date}.geojson"
-
-            # Nexus Points
-            swe_path = local_geojson_directory / file
-            with open(swe_path) as nf:
-                swe_geojson = json.loads(nf.read())
-
-            gdf = gpd.GeoDataFrame.from_features(swe_geojson["features"])
-            # Round the 'SWE' column and create 'swe_value'
-            gdf["SWE"] = gdf["SWE"].round(0)
-            gdf["x"] = gdf["x"].round(3)
-            gdf["y"] = gdf["y"].round(3)
-
-            # convert back to geojson
-            swe_geojson = json.loads(gdf.to_json())
-
-            swe_layer = self.build_geojson_layer(
-                geojson=swe_geojson,
-                layer_name="SWE",
-                layer_title=date,
-                layer_variable="swe",
-                visible=True,
-                selectable=True,
-                plottable=True,
-                show_legend=True,
-            )
-
-            # Create layer groups
-            layer_groups = [
-                self.build_layer_group(
-                    id="sweml",
-                    display_name="SWE 1-km",
-                    layer_control="checkbox",  # 'checkbox' or 'radio'
-                    layers=[
-                        swe_layer,
-                    ],
-                )
-            ]
-            """
             layer_groups = []
-            messages.error(request, mark_safe("SWE prediction not available. <br/> Select a different date"))
+            messages.error(request, mark_safe("SWE prediction not available for selected date. <br/> Select a different date"))
 
         return layer_groups
 
