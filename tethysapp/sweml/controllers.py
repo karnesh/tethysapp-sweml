@@ -4,6 +4,8 @@ from pathlib import Path
 import pandas as pd
 from tethys_sdk.layouts import MapLayout
 from tethys_sdk.routing import controller
+from django.contrib import messages
+from django.utils.safestring import mark_safe
 from .app import Sweml as app
 import geopandas as gpd
 
@@ -137,6 +139,7 @@ class swe(MapLayout):
             ]
 
         except:
+            """
             date = "2024-07-12"
 
             file = f"SWE_{date}.geojson"
@@ -177,6 +180,9 @@ class swe(MapLayout):
                     ],
                 )
             ]
+            """
+            layer_groups = []
+            messages.error(request, mark_safe("SWE prediction not available. <br/> Select a different date"))
 
         return layer_groups
 
