@@ -68,6 +68,8 @@ class swe(MapLayout):
             dict: modified context dictionary.
         """
 
+        initial_date = datetime.datetime.today().strftime('%Y-%m-%d')
+
         date_picker = DatePicker(
             name="date",
             display_text="Date",
@@ -77,7 +79,7 @@ class swe(MapLayout):
             end_date="today",
             start_view="year",
             today_button=False,
-            initial="2024-07-12",
+            initial=initial_date,
         )
 
         # Call Super
