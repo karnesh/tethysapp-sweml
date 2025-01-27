@@ -93,9 +93,8 @@ class swe(MapLayout):
         """
         Add layers to the MapLayout and create associated layer group objects.
         """
-        # Load GeoJSON from files
-        local_geojson_directory = Path(app_workspace.path) / MODEL_OUTPUT_FOLDER_NAME / "geojson"
 
+        # Load GeoJSON from AWS s3
         s3_geojson_directory = "Neural_Network/Hold_Out_Year/Daily/GeoJSON"
 
         try:
@@ -145,7 +144,8 @@ class swe(MapLayout):
 
         except:
             layer_groups = []
-            messages.error(request, mark_safe("SWE prediction not available for selected date. <br/> Select a different date"))
+            messages.error(request, mark_safe("SWE prediction not available for selected date. <br/> Select a "
+                                              "different date"))
 
         return layer_groups
 
