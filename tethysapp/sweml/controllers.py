@@ -9,8 +9,8 @@ from django.utils.safestring import mark_safe
 from .app import Sweml as app
 import geopandas as gpd
 
-# Date picker
-from tethys_sdk.gizmos import DatePicker
+# Gizmos
+from tethys_sdk.gizmos import DatePicker, SelectInput
 
 # functions to load AWS data
 import boto3
@@ -82,10 +82,40 @@ class swe(MapLayout):
             initial=initial_date,
         )
 
+        model_id = SelectInput(
+            display_text='Select Model',
+            name='model_id',
+            multiple=False,
+            options=[
+                {'National Snow Model v1.0': 'SWEMLv1.0'},
+                {'Regional Snow Model v1.0': 'SWEML_regionalv1.0'}
+            ],
+            initial=['National Snow Model v1.0'],
+            select2_options={
+                'placeholder': 'Select a model',
+                'allowClear': True
+            }
+        )
+
+        region_id = SelectInput(
+            display_text='Select Region',
+            name='region_id',
+            multiple=False,
+            options=[{'Tuolumne Basin': 'Tuolumne_Basin'},
+                     {'Regional Snow Model v1.0': 'SWEML_regionalv1.0'}],
+            initial=['Tuolumne Basin'],
+            select2_options={
+                'placeholder': 'Select a region',
+                'allowClear': True
+            }
+        )
+
         # Call Super
         context = super().get_context(request, *args, **kwargs)
 
         context["date_picker"] = date_picker
+        context['model_id'] = model_id
+        context['region_id'] = region_id
 
         return context
 
@@ -160,8 +190,8 @@ class swe(MapLayout):
             },
         }
 
-    def get_plot_for_layer_feature(self, request, layer_name, feature_id, layer_data, feature_props, app_workspace, 
-                                   *args, **kwargs,):
+    def get_plot_for_layer_feature(self, request, layer_name, feature_id, layer_data, feature_props, app_workspace,
+                                   *args, **kwargs, ):
         """
         Retrieves plot data for given feature on given layer.
 
