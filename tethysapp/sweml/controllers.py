@@ -101,7 +101,8 @@ class swe(MapLayout):
             display_text='Select Region',
             name='region_id',
             multiple=False,
-            options=[('Tuolumne Basin', 'Tuolumne_Basin')],
+            options=[('Tuolumne Basin', 'Tuolumne_Basin'),
+                     ('Upper Colorado River Basin', 'UCRB')],
             initial=['Tuolumne Basin'],
             select2_options={
                 'placeholder': 'Select a region',
