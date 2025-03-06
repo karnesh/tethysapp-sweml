@@ -87,8 +87,8 @@ class swe(MapLayout):
             name='model_id',
             multiple=False,
             options=[
-                {'National Snow Model v1.0': 'SWEMLv1.0'},
-                {'Regional Snow Model v1.0': 'SWEML_regionalv1.0'}
+                ('National Snow Model v1.0', 'SWEMLv1.0'),
+                ('Regional Snow Model v1.0', 'SWEML_regionalv1.0'),
             ],
             initial=['National Snow Model v1.0'],
             select2_options={
@@ -101,8 +101,7 @@ class swe(MapLayout):
             display_text='Select Region',
             name='region_id',
             multiple=False,
-            options=[{'Tuolumne Basin': 'Tuolumne_Basin'},
-                     {'Regional Snow Model v1.0': 'SWEML_regionalv1.0'}],
+            options=[('Tuolumne Basin', 'Tuolumne_Basin')],
             initial=['Tuolumne Basin'],
             select2_options={
                 'placeholder': 'Select a region',

@@ -17,7 +17,9 @@
   {{ block.super }}
   <br>
   <form action="{% url 'sweml:swe' %}" method="get">
-    <p>Input date from the dropdown below to view SWE predictions and an interactive map.</p>
+    <p>Select from the dropdown below to view SWE predictions and an interactive map.</p>
+    <div style="width:100%">{% gizmo SelectInput model_id %}</div>
+    <div style="width:100%">{% gizmo SelectInput region_id %}</div>
     <div style="width:100%">{% gizmo date_picker date_picker %}</div>
     <span class="btn-group ">
         <a name="submit-go-to-map" class="btn btn-success" role="button" onclick="document.forms[0].submit();">
