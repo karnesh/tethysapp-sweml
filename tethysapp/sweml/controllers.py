@@ -18,12 +18,20 @@ from botocore import UNSIGNED
 from botocore.client import Config
 import os
 
-os.environ["AWS_NO_SIGN_REQUEST"] = "YES"
+# os.environ["AWS_NO_SIGN_REQUEST"] = "YES"
 
 # Set Global Variables
 
 BUCKET_NAME = "national-snow-model"
-s3 = boto3.resource("s3", config=Config(signature_version=UNSIGNED))
+# s3 = boto3.resource("s3", config=Config(signature_version=UNSIGNED))
+ACCESS = pd.read_csv("AWSaccessKeys.csv")
+
+#start session
+SESSION = boto3.Session(
+    aws_access_key_id=ACCESS['Access key ID'][0],
+    aws_secret_access_key=ACCESS['Secret access key'][0],
+)
+s3 = SESSION.resource('s3')
 
 # Controller base configurations
 basemaps = [
