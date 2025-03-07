@@ -83,7 +83,7 @@ class swe(MapLayout):
             display_text="Date",
             autoclose=False,
             format="yyyy-mm-dd",
-            start_date="2022-10-01",
+            start_date="2015-10-01",
             end_date="today",
             start_view="year",
             today_button=False,
@@ -132,15 +132,25 @@ class swe(MapLayout):
         Add layers to the MapLayout and create associated layer group objects.
         """
 
-        # Load GeoJSON from AWS s3
-        s3_geojson_directory = "Neural_Network/Hold_Out_Year/Daily/GeoJSON"
-
         try:
             # http request for user inputs
+            model_id = request.GET.get("model_id")
+            if model_id == "SWEML_regionalv1.0":
+                region_id = request.GET.get("region_id")
             date = request.GET.get("date")
 
             if not date:
                 date = datetime.datetime.today().strftime('%Y-%m-%d')
+
+            # set AWS path for GeoJSON files
+            if model_id == "SWEMLv1.0":
+                s3_geojson_directory = "Neural_Network/Hold_Out_Year/Daily/GeoJSON"
+            else:
+                if int(date[5:7]) < 10:
+                    year = int(date[0:4]) - 1
+                else:
+                    year = date[0:4]
+                s3_geojson_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/GeoJSON"
 
             file = f"SWE_{date}.geojson"
             file_path = f"{s3_geojson_directory}/{file}"
