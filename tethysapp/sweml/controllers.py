@@ -145,12 +145,14 @@ class swe(MapLayout):
             # set AWS path for GeoJSON files
             if model_id == "SWEMLv1.0":
                 s3_geojson_directory = "Neural_Network/Hold_Out_Year/Daily/GeoJSON"
+                layer_name = "SWE"
             else:
                 if int(date[5:7]) < 10:
                     year = int(date[0:4]) - 1
                 else:
                     year = date[0:4]
                 s3_geojson_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/GeoJSON"
+                layer_name = f"SWE_{region_id}"
 
             file = f"SWE_{date}.geojson"
             file_path = f"{s3_geojson_directory}/{file}"
@@ -169,7 +171,7 @@ class swe(MapLayout):
 
             swe_layer = self.build_geojson_layer(
                 geojson=swe_geojson,
-                layer_name="SWE",
+                layer_name=layer_name,
                 layer_title=date,
                 layer_variable="swe",
                 visible=True,
@@ -223,8 +225,6 @@ class swe(MapLayout):
             str, list<dict>, dict: plot title, data series, and layout options, respectively.
         """
 
-        csv_directory = "Neural_Network/Hold_Out_Year/Daily/csv"
-
         # Get the feature id
         x = feature_props.get("x")
         y = feature_props.get("y")
@@ -237,9 +237,16 @@ class swe(MapLayout):
             end_date = pd.to_datetime(datetime.date(date.year, 9, 30))
 
         # SWE
-        if layer_name == "SWE":
+        if "SWE" in layer_name:
             layout = {"yaxis": {"title": "SWE 1-km in inches"}}
 
+            if layer_name == "SWE":
+                csv_directory = "Neural_Network/Hold_Out_Year/Daily/csv"
+            else:
+                region_id = layer_name[4:]
+                year = start_date.year
+                csv_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/csv"
+            print(csv_directory)
             file = f"swe_1000m_{y:.3f}_{x:.3f}.csv"
             file_path = f"{csv_directory}/{file}"
             file_object = s3.Object(BUCKET_NAME, file_path)
@@ -252,8 +259,9 @@ class swe(MapLayout):
             # Parse with Pandas
             df = pd.read_csv(file_content)
             df.date = pd.to_datetime(df.date)
-            mask = (df["date"] > start_date) & (df["date"] <= end_date)
-            df = df.loc[mask]
+            if layer_name == "SWE":
+                mask = (df["date"] > start_date) & (df["date"] <= end_date)
+                df = df.loc[mask]
             time_col = df.iloc[:, 0]
             swe_col = df.iloc[:, 1]
             data = [

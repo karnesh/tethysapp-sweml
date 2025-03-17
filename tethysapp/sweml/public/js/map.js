@@ -33,7 +33,7 @@ $(function() { // Wait for the page to load
     var swe_layer;
     layers.forEach(layer => {
         if ("tethys_data" in layer){
-            if (layer.tethys_data.layer_name == "SWE") {
+            if (layer.tethys_data.layer_name.includes("SWE")) {
                 swe_layer = layer;
             }
         }
