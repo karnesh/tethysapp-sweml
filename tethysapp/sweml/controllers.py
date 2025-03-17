@@ -240,13 +240,14 @@ class swe(MapLayout):
         if "SWE" in layer_name:
             layout = {"yaxis": {"title": "SWE 1-km in inches"}}
 
+            # S3 path for csv files
             if layer_name == "SWE":
                 csv_directory = "Neural_Network/Hold_Out_Year/Daily/csv"
             else:
                 region_id = layer_name[4:]
                 year = start_date.year
                 csv_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/csv"
-            print(csv_directory)
+
             file = f"swe_1000m_{y:.3f}_{x:.3f}.csv"
             file_path = f"{csv_directory}/{file}"
             file_object = s3.Object(BUCKET_NAME, file_path)
