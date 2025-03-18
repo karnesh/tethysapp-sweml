@@ -38,21 +38,23 @@ $(function() { // Wait for the page to load
             }
         }
     });
-     
-    var features = swe_layer.getSource().getFeatures();
     
-    for (let feature of features) {
-        let color = setFeatureColor(feature);
-        let style = new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: color,
-            }),
-        });
-        feature.setStyle(style);
+    if (swe_layer){
+        var features = swe_layer.getSource().getFeatures();
+        
+        for (let feature of features) {
+            let color = setFeatureColor(feature);
+            let style = new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: color,
+                }),
+            });
+            feature.setStyle(style);
+        }
+    
+        // Call the function to create the legend
+        createLegend();
     }
-
-    // Call the function to create the legend
-    createLegend();
 
 });
 
