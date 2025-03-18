@@ -61,7 +61,6 @@ function setFeatureColor(feature) {
     let swe = feature.get('SWE');
 
     let key = Math.floor(swe / 2.5) * 2.5 + 2.5;
-    console.log(swe, key)
     return color_dict[key];
 }
 
