@@ -2,26 +2,26 @@ let opacity = 0.8;
 
 const color_dict = {
     0: 'rgba(0, 0, 0, 0)',
-    2.5: `rgba(248, 248, 248, ${opacity})`,
-    5: `rgba(221, 221, 248, ${opacity})`,
-    7.5: `rgba(194, 194, 248, ${opacity})`,
-    10: `rgba(167, 167, 248, ${opacity})`,
-    12.5: `rgba(140, 140, 248, ${opacity})`,
-    15: `rgba(113, 113, 248, ${opacity})`,
-    17.5: `rgba(86, 86, 248, ${opacity})`,
-    20: `rgba(59, 59, 248, ${opacity})`,
-    22.5: `rgba(30, 30, 248, ${opacity})`,
-    25: `rgba(0, 0, 248, ${opacity})`,
-    27.5: `rgba(81, 40, 137, ${opacity})`,
-    30: `rgba(100, 45, 144, ${opacity})`,
-    32.5: `rgba(119, 51, 151, ${opacity})`,
-    35: `rgba(139, 56, 159, ${opacity})`,
-    37.5: `rgba(158, 62, 166, ${opacity})`,
-    40: `rgba(177, 67, 173, ${opacity})`,
-    42.5: `rgba(197, 73, 181, ${opacity})`,
-    45: `rgba(216, 78, 188, ${opacity})`,
-    47.5: `rgba(235, 84, 195, ${opacity})`,
-    50: `rgba(255, 90, 204, ${opacity})`
+    3: `rgba(248, 248, 248, ${opacity})`,
+    6: `rgba(221, 221, 248, ${opacity})`,
+    9: `rgba(194, 194, 248, ${opacity})`,
+    12: `rgba(167, 167, 248, ${opacity})`,
+    15: `rgba(140, 140, 248, ${opacity})`,
+    18: `rgba(113, 113, 248, ${opacity})`,
+    21: `rgba(86, 86, 248, ${opacity})`,
+    24: `rgba(59, 59, 248, ${opacity})`,
+    27: `rgba(30, 30, 248, ${opacity})`,
+    30: `rgba(0, 0, 248, ${opacity})`,
+    33: `rgba(81, 40, 137, ${opacity})`,
+    36: `rgba(100, 45, 144, ${opacity})`,
+    39: `rgba(119, 51, 151, ${opacity})`,
+    42: `rgba(139, 56, 159, ${opacity})`,
+    45: `rgba(158, 62, 166, ${opacity})`,
+    48: `rgba(177, 67, 173, ${opacity})`,
+    51: `rgba(197, 73, 181, ${opacity})`,
+    54: `rgba(216, 78, 188, ${opacity})`,
+    57: `rgba(235, 84, 195, ${opacity})`,
+    60: `rgba(255, 90, 204, ${opacity})`
 };
 
 
@@ -62,7 +62,7 @@ function setFeatureColor(feature) {
     
     let swe = feature.get('SWE');
 
-    let key = Math.floor(swe / 2.5) * 2.5 + 2.5;
+    let key = Math.floor(swe / 3) * 3 + 3;
     return color_dict[key];
 }
 
@@ -87,7 +87,7 @@ function createLegend() {
     labelsDiv.id = 'legend-labels';
 
     // Create labels
-    let labelValues = [0, 10, 20, 30, 40, 50]; // Adjust label positions as needed
+    let labelValues = [0, 10, 20, 30, 40, 50, 60]; // Adjust label positions as needed
     for (let value of labelValues) {
         let label = document.createElement('div');
         label.innerText = `${value} in`;
@@ -106,7 +106,7 @@ function createColorGradient(color_dict) {
 
     for (let key of keys) {
         let color = color_dict[key];
-        let percentage = (key / 50) * 100; // Assuming max value is 100
+        let percentage = (key / 60) * 100; // Assuming max value is 60
         gradientColors.push(`${color} ${percentage}%`);
     }
 
