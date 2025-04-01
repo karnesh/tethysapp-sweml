@@ -15,7 +15,7 @@ resource_files = find_all_resource_files(app_package, TethysAppBase.package_name
 
 setup(
     name=release_package,
-    version='0.0.1',
+    version='1.0',
     description='App to display 1-km resolution SWE prediction from deep learning models',
     long_description='',
     keywords='',
