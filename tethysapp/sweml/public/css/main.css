@@ -9,22 +9,30 @@
     font-size: 12px;
     z-index: 1000;
   }
-  #legend-title {
+  
+ #legend-title {
     text-align: center;
     margin-bottom: 5px;
     font-weight: bold;
-  }
-  #legend-color-ramp {
+ }
+ 
+ #legend-color-ramp {
     width: 400px;
     height: 20px;
     border: 1px solid black;
-  }
-  #legend-labels {
+ }
+ 
+ #legend-labels {
     display: flex;
     justify-content: space-between;
     margin-top: 5px;
-  }
-  #legend-labels div {
+ }
+ 
+ #legend-labels div {
     font-size: 12px;
     color: #000;
-  }
+ }
+  
+ #region-id-div{
+    display:none;
+ }

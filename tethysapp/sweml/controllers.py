@@ -48,7 +48,7 @@ min_zoom = 1
 MODEL_OUTPUT_FOLDER_NAME = "swe"
 
 
-@controller(name="swe", url="swe/", app_workspace=True)
+@controller(name="sweml", app_workspace=True)
 class swe(MapLayout):
     app = app
     base_template = "sweml/base.html"
@@ -58,8 +58,6 @@ class swe(MapLayout):
     max_zoom = max_zoom
     min_zoom = min_zoom
     show_properties_popup = True
-    # show_map_clicks = True
-    # show_map_click_popup = True
     plot_slide_sheet = True
     template_name = "sweml/swe.html"
     show_legends = True
@@ -102,7 +100,8 @@ class swe(MapLayout):
             select2_options={
                 'placeholder': 'Select a model',
                 'allowClear': True
-            }
+            },
+            attributes={"onchange": "regionSelectionVisibility();", "id": "model_id"}
         )
 
         region_id = SelectInput(
@@ -115,7 +114,7 @@ class swe(MapLayout):
             select2_options={
                 'placeholder': 'Select a region',
                 'allowClear': True
-            }
+            },
         )
 
         # Call Super

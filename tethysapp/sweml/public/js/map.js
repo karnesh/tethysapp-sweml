@@ -114,3 +114,13 @@ function createColorGradient(color_dict) {
     let gradientString = `linear-gradient(to right, ${gradientColors.join(', ')})`;
     return gradientString;
 }
+    
+function regionSelectionVisibility(){
+    let model_id = document.getElementById("model_id").value;
+    let region_id = document.getElementById("region-id-div");
+    if (model_id === "SWEML_regionalv1.0"){
+        region_id.style.display = "block";
+    } else{
+        region_id.style.display = "none";
+    }
+}

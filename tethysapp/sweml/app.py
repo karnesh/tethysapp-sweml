@@ -9,7 +9,7 @@ class Sweml(TethysAppBase):
     name = 'SWEML'
     description = 'App to display 1-km resolution SWE prediction from deep learning models'
     package = 'sweml'  # WARNING: Do not change this value
-    index = 'swe'
+    index = 'sweml'
     icon = f'{package}/images/Superior.jpg'
     root_url = 'sweml'
     color = '#c23616'
