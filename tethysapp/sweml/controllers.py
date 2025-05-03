@@ -27,12 +27,12 @@ if not os.path.exists(csv_path):
 
 ACCESS = pd.read_csv(csv_path)
 
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', ACCESS['Access key ID'][0])
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', ACCESS['Secret access key'][0])
+SWEML_AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', ACCESS['Access key ID'][0])
+SWEML_AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', ACCESS['Secret access key'][0])
 
 SESSION = boto3.Session(
-    aws_access_key_id = AWS_ACCESS_KEY_ID,
-    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
+    aws_access_key_id = SWEML_AWS_ACCESS_KEY_ID,
+    aws_secret_access_key = SWEML_AWS_SECRET_ACCESS_KEY,
 )
 
 s3 = SESSION.resource('s3')
