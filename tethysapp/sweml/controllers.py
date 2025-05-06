@@ -98,22 +98,37 @@ class swe(MapLayout):
             multiple=False,
             options=[
                 ('National Snow Model v1.0', 'SWEMLv1.0'),
-                ('Regional Snow Model v1.0', 'SWEML_regionalv1.0'),
             ],
             initial=['National Snow Model v1.0'],
             select2_options={
                 'placeholder': 'Select a model',
                 'allowClear': True
             },
-            attributes={"onchange": "regionSelectionVisibility();", "id": "model_id"}
+            # attributes={"onchange": "regionSelectionVisibility();", "id": "model_id"}
         )
 
         region_id = SelectInput(
             display_text='Select Region',
             name='region_id',
             multiple=False,
-            options=[('Tuolumne Basin', 'Tuolumne_Basin'),
-                     ('Upper Colorado River Basin', 'UCRB')],
+            options=[('Blue River', 'Blue_River'),
+                     ('Castle and Maroon Creek', 'Castle_and_Maroon_Creek'),
+                     ('Cherry and Eleanor Creek', 'Cherry_and_Eleanor_Creek'),
+                     ('East River', 'East_River'),
+                     ('Kaweah River', 'Kaweah_River'),
+                     ('Kings Canyon', 'Kings_Canyon'),
+                     ('Lee Vining Creek', 'Lee_Vining_Creek'),
+                     ('Mammoth Lakes Basin', 'Mammoth_Lakes_Basin'),
+                     ('Mercerd River', 'Merced_River'),
+                     ('Olympic Mountains', 'Olympic_Mountains'),
+                     ('Rio Grande', 'Rio_Grande'),
+                     ('Rush Creek', 'Rush_Creek'),
+                     ('San Joaquin River', 'San_Joaquin_River'),
+                     ('Taylor River', 'Taylor_River'),
+                     ('Tuolumne Basin', 'Tuolumne_Basin'),
+                     ('Tuolumne River', 'Tuolumne_River'),
+                     ('Upper Colorado River Basin', 'UCRB'),
+                     ],
             initial=['Tuolumne Basin'],
             select2_options={
                 'placeholder': 'Select a region',
@@ -138,8 +153,7 @@ class swe(MapLayout):
         try:
             # http request for user inputs
             model_id = request.GET.get("model_id")
-            if model_id == "SWEML_regionalv1.0":
-                region_id = request.GET.get("region_id")
+            region_id = request.GET.get("region_id")
             date = request.GET.get("date")
 
             if not date:
@@ -168,6 +182,10 @@ class swe(MapLayout):
             gdf["SWE"] = gdf["SWE"].round(3)
             gdf["x"] = gdf["x"].round(3)
             gdf["y"] = gdf["y"].round(3)
+
+            if region_id != "Tuolumne_Basin" or region_id != "UCRB":
+                geom_mask = gpd.read_file(f"workspaces/app_workspace/shapefiles/{region_id}.shp")
+                gdf = gpd.clip(gdf, geom_mask)
 
             # convert back to geojson
             swe_geojson = json.loads(gdf.to_json())
