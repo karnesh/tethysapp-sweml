@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 from .app import Sweml as app
 import geopandas as gpd
-
+from importlib import resources
 # Gizmos
 from tethys_sdk.gizmos import DatePicker, SelectInput
 
@@ -18,19 +18,23 @@ from botocore import UNSIGNED
 from botocore.client import Config
 import os
 
-# os.environ["AWS_NO_SIGN_REQUEST"] = "YES"
-
-# Set Global Variables
-
 BUCKET_NAME = "national-snow-model"
-# s3 = boto3.resource("s3", config=Config(signature_version=UNSIGNED))
-ACCESS = pd.read_csv("AWSaccessKeys.csv")
 
-#start session
+csv_path = resources.files('tethysapp.sweml').joinpath('AWSaccessKeys.csv')
+
+if not os.path.exists(csv_path):
+    raise FileNotFoundError(f"File {csv_path} not found. Please check the path.")
+
+ACCESS = pd.read_csv(csv_path)
+
+SWEML_AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', ACCESS['Access key ID'][0])
+SWEML_AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', ACCESS['Secret access key'][0])
+
 SESSION = boto3.Session(
-    aws_access_key_id=ACCESS['Access key ID'][0],
-    aws_secret_access_key=ACCESS['Secret access key'][0],
+    aws_access_key_id = SWEML_AWS_ACCESS_KEY_ID,
+    aws_secret_access_key = SWEML_AWS_SECRET_ACCESS_KEY,
 )
+
 s3 = SESSION.resource('s3')
 
 # Controller base configurations
