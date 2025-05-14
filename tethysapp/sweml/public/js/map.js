@@ -131,6 +131,9 @@ function updateData(event) {
   const loadingDiv = document.querySelector('.loading-text');
   loadingDiv.style.display = 'block';
 
+  const errorDiv = document.querySelector('.error-text');
+  errorDiv.style.display = 'none';
+
   
   let date = document.getElementById("date").value;
   let region_id = document.getElementById("region_id").value;
@@ -152,12 +155,14 @@ function updateData(event) {
   })
   .then(resp => resp.ok ? resp.json() : Promise.reject(resp))
   .then(data => {
-    console.log('Server replied:', data);
-    // if (!data.success) {
-    //   console.error('Error in server response:', data);
-    //   return;
-    // }
-
+    
+    if (!data.success) {
+      console.error('Error in server response:', data);
+      errorDiv.style.display = 'block';
+      const errorp = document.getElementById('text-error-p');
+        errorp.innerHTML = "No data available for the selected date.";
+      return;
+    }
     var olMap = TETHYS_MAP_VIEW.getMap();
     const mapProj = olMap.getView().getProjection();
 

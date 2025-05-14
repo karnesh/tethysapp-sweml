@@ -179,7 +179,7 @@ class swe(MapLayout):
             swe_layer = self.build_geojson_layer(
                 geojson=swe_geojson,
                 layer_name=layer_name,
-                layer_title=date,
+                layer_title=layer_name,
                 layer_variable="swe",
                 visible=True,
                 selectable=True,
@@ -210,7 +210,7 @@ class swe(MapLayout):
             swe_layer = self.build_geojson_layer(
                 geojson=swe_geojson,
                 layer_name=layer_name,
-                layer_title=date,
+                layer_title=layer_name,
                 layer_variable="swe",
                 visible=True,
                 selectable=True,
@@ -262,7 +262,7 @@ class swe(MapLayout):
         """
         x = feature_props.get("x")
         y = feature_props.get("y")
-        date = datetime.datetime.strptime(layer_data["popup_title"], "%Y-%m-%d")
+        date = datetime.datetime.strptime(request.session['date'], "%Y-%m-%d")
         if date.month >= 10:
             start_date = pd.to_datetime(datetime.date(date.year, 10, 1))
             end_date = pd.to_datetime(datetime.date(date.year + 1, 9, 30))
@@ -353,7 +353,7 @@ class swe(MapLayout):
             swe_layer = self.build_geojson_layer(
                 geojson=swe_geojson,
                 layer_name=layer_name,
-                layer_title=date,
+                layer_title=layer_name,
                 layer_variable="swe",
                 visible=True,
                 selectable=True,
@@ -375,7 +375,7 @@ class swe(MapLayout):
             swe_layer = self.build_geojson_layer(
                 geojson=swe_geojson,
                 layer_name=layer_name,
-                layer_title=date,
+                layer_title=layer_name,
                 layer_variable="swe",
                 visible=True,
                 selectable=True,

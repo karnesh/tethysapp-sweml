@@ -40,3 +40,20 @@
 .map-tabs {
     height: fit-content !important;
 }
+
+.loading-text{
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.loading-text p {
+  animation: blink 1s infinite;
+}
