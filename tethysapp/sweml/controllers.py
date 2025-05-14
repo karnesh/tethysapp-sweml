@@ -5,6 +5,8 @@ import pandas as pd
 from tethys_sdk.layouts import MapLayout
 from tethys_sdk.routing import controller
 from django.contrib import messages
+from django.http import JsonResponse
+
 from django.utils.safestring import mark_safe
 from .app import Sweml as app
 import geopandas as gpd
@@ -17,18 +19,25 @@ import boto3
 from botocore import UNSIGNED
 from botocore.client import Config
 import os
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 BUCKET_NAME = "national-snow-model"
 
 csv_path = resources.files('tethysapp.sweml').joinpath('AWSaccessKeys.csv')
 
 if not os.path.exists(csv_path):
-    raise FileNotFoundError(f"File {csv_path} not found. Please check the path.")
+    logging.warning(f"File {csv_path} does not exist. Using environment variables instead.")
+    SWEML_AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    SWEML_AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 
-ACCESS = pd.read_csv(csv_path)
+else:
+    logging.warning(f"File {csv_path} exists. Using it to load AWS access keys.")
+    ACCESS = pd.read_csv(csv_path)
+    SWEML_AWS_ACCESS_KEY_ID = ACCESS['Access key ID'][0]
+    SWEML_AWS_SECRET_ACCESS_KEY = ACCESS['Secret access key'][0]
 
-SWEML_AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', ACCESS['Access key ID'][0])
-SWEML_AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', ACCESS['Secret access key'][0])
 
 SESSION = boto3.Session(
     aws_access_key_id = SWEML_AWS_ACCESS_KEY_ID,
@@ -134,29 +143,29 @@ class swe(MapLayout):
         """
         Add layers to the MapLayout and create associated layer group objects.
         """
+        # http request for user inputs
+        model_id = request.GET.get("model_id")
+        # if model_id == "SWEML_regionalv1.0":
+        #     region_id = request.GET.get("region_id")
+        date = request.GET.get("date")
 
-        try:
-            # http request for user inputs
-            model_id = request.GET.get("model_id")
-            if model_id == "SWEML_regionalv1.0":
-                region_id = request.GET.get("region_id")
-            date = request.GET.get("date")
+        if not date:
+            date = datetime.datetime.today().strftime('%Y-%m-%d')
 
-            if not date:
-                date = datetime.datetime.today().strftime('%Y-%m-%d')
-
-            # set AWS path for GeoJSON files
-            if model_id == "SWEMLv1.0":
-                s3_geojson_directory = "Neural_Network/Hold_Out_Year/Daily/GeoJSON"
-                layer_name = "SWE"
+        # set AWS path for GeoJSON files
+        if model_id == "SWEMLv1.0":
+            s3_geojson_directory = "Neural_Network/Hold_Out_Year/Daily/GeoJSON"
+            layer_name = "SWE"
+        else:
+            if int(date[5:7]) < 10:
+                year = int(date[0:4]) - 1
             else:
-                if int(date[5:7]) < 10:
-                    year = int(date[0:4]) - 1
-                else:
-                    year = date[0:4]
-                s3_geojson_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/GeoJSON"
-                layer_name = f"SWE_{region_id}"
-
+                year = date[0:4]
+            region_id = request.GET.get("region_id")
+            s3_geojson_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/GeoJSON"
+            layer_name = f"SWE_{region_id}"
+        
+        try:
             file = f"SWE_{date}.geojson"
             file_path = f"{s3_geojson_directory}/{file}"
             file_object = s3.Object(BUCKET_NAME, file_path)
@@ -171,7 +180,7 @@ class swe(MapLayout):
 
             # convert back to geojson
             swe_geojson = json.loads(gdf.to_json())
-
+            
             swe_layer = self.build_geojson_layer(
                 geojson=swe_geojson,
                 layer_name=layer_name,
@@ -196,7 +205,34 @@ class swe(MapLayout):
             ]
 
         except:
-            layer_groups = []
+            swe_geojson = {
+                "type": "FeatureCollection",
+                "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                "features": []
+            }
+            swe_layer = self.build_geojson_layer(
+                geojson=swe_geojson,
+                layer_name=layer_name,
+                layer_title=date,
+                layer_variable="swe",
+                visible=True,
+                selectable=True,
+                plottable=True,
+                show_legend=True,
+            )
+
+            # Create layer groups
+            layer_groups = [
+                self.build_layer_group(
+                    id="sweml",
+                    display_name="SWE 1-km",
+                    layer_control="checkbox",  # 'checkbox' or 'radio'
+                    layers=[
+                        swe_layer,
+                    ],
+                )
+            ]
+
             messages.error(request, mark_safe("SWE prediction not available for selected date. <br/> Select a "
                                               "different date"))
 
@@ -279,3 +315,84 @@ class swe(MapLayout):
             ]
 
             return f"SWE at Lat: {y:.3f} Lon: {x:.3f}", data, layout
+
+    def update_sweml_data(self, request, *args, **kwargs):
+        
+        data = request.POST or request.json()
+        request.session['model_id'] = data.get('model_id')
+        request.session['date'] = data.get('date')
+        request.session['region_id'] = data.get('region_id', "")
+        
+        # http request for user inputs
+        model_id = request.session['model_id']
+        # if model_id == "SWEML_regionalv1.0":
+        #     region_id = request.session['region_id']
+        date =  request.session['date']
+
+        if not date:
+            date = datetime.datetime.today().strftime('%Y-%m-%d')
+
+        # set AWS path for GeoJSON files
+        if model_id == "SWEMLv1.0":
+            s3_geojson_directory = "Neural_Network/Hold_Out_Year/Daily/GeoJSON"
+            layer_name = "SWE"
+        else:
+            if int(date[5:7]) < 10:
+                year = int(date[0:4]) - 1
+            else:
+                year = date[0:4]
+            region_id = request.session['region_id']                
+            s3_geojson_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/GeoJSON"
+            layer_name = f"SWE_{region_id}"
+
+        try:
+            file = f"SWE_{date}.geojson"
+            file_path = f"{s3_geojson_directory}/{file}"
+            file_object = s3.Object(BUCKET_NAME, file_path)
+            file_content = file_object.get()["Body"].read().decode("utf-8")
+            swe_geojson = json.loads(file_content)
+
+            # this is to get the rounded SWE values
+            gdf = gpd.GeoDataFrame.from_features(swe_geojson["features"])
+            gdf["SWE"] = gdf["SWE"].round(3)
+            gdf["x"] = gdf["x"].round(3)
+            gdf["y"] = gdf["y"].round(3)
+
+            # convert back to geojson
+            swe_geojson = json.loads(gdf.to_json())
+
+            swe_layer = self.build_geojson_layer(
+                geojson=swe_geojson,
+                layer_name=layer_name,
+                layer_title=date,
+                layer_variable="swe",
+                visible=True,
+                selectable=True,
+                plottable=True,
+                show_legend=True,
+            )
+
+            return JsonResponse({'success': True,'metadata': swe_layer ,'geojson': swe_geojson})
+
+        except:
+            messages.error(request, mark_safe("SWE prediction not available for selected date. <br/> Select a "
+                                              "different date"))
+            swe_geojson = {
+                "type": "FeatureCollection",
+                "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                "features": []
+            }
+            swe_layer = self.build_geojson_layer(
+                geojson=swe_geojson,
+                layer_name=layer_name,
+                layer_title=date,
+                layer_variable="swe",
+                visible=True,
+                selectable=True,
+                plottable=True,
+                show_legend=True,
+            )
+     
+            return JsonResponse({'success': False,'metadata': swe_layer ,'geojson': swe_geojson})
+
+        

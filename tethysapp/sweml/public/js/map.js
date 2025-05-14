@@ -25,38 +25,6 @@ const color_dict = {
 };
 
 
-$(function() { // Wait for the page to load
-
-    var map = TETHYS_MAP_VIEW.getMap();
-    var layers = map.getLayers();
-
-    var swe_layer;
-    layers.forEach(layer => {
-        if ("tethys_data" in layer){
-            if (layer.tethys_data.layer_name.includes("SWE")) {
-                swe_layer = layer;
-            }
-        }
-    });
-    
-    if (swe_layer){
-        var features = swe_layer.getSource().getFeatures();
-        
-        for (let feature of features) {
-            let color = setFeatureColor(feature);
-            let style = new ol.style.Style({
-                fill: new ol.style.Fill({
-                    color: color,
-                }),
-            });
-            feature.setStyle(style);
-        }
-    
-        // Call the function to create the legend
-        createLegend();
-    }
-
-});
 
 function setFeatureColor(feature) {
     
@@ -123,4 +91,111 @@ function regionSelectionVisibility(){
     } else{
         region_id.style.display = "none";
     }
+}
+
+const inject_map_data = (layer, metadata) => {
+  layer.tethys_legend_title = metadata.legend_title;
+  layer.tethys_legend_classes = metadata.legend_classes;
+  layer.tethys_legend_extent = metadata.legend_extent;
+  layer.tethys_legend_extent_projection = metadata.legend_extent_projection;
+  layer.tethys_editable = metadata.editable;
+  layer.tethys_data = metadata.data;
+};
+
+function getCookie(name) {
+  const cookies = document.cookie.split(';');
+  for (const c of cookies) {
+    const [key, value] = c.trim().split('=');
+    if (key === name) return decodeURIComponent(value);
+  }
+  return null;
+}
+
+
+const csrftoken = getCookie('csrftoken'); // same-origin only
+
+$(function() { 
+    createLegend();
+});
+
+
+
+
+
+document.getElementById('sweml-form').addEventListener('submit', updateData);
+
+function updateData(event) {
+  event.preventDefault();
+
+  // Show loading message
+  const loadingDiv = document.querySelector('.loading-text');
+  loadingDiv.style.display = 'block';
+
+  
+  let date = document.getElementById("date").value;
+  let region_id = document.getElementById("region_id").value;
+  let model_id = document.getElementById("model_id").value;
+
+  var data = new URLSearchParams();
+  data.append('method', 'update_sweml_data');
+  data.append('date', date);
+  data.append('region_id', region_id);
+  data.append('model_id', model_id);
+
+  fetch('.', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': csrftoken
+    },
+    body: data
+  })
+  .then(resp => resp.ok ? resp.json() : Promise.reject(resp))
+  .then(data => {
+    console.log('Server replied:', data);
+    // if (!data.success) {
+    //   console.error('Error in server response:', data);
+    //   return;
+    // }
+
+    var olMap = TETHYS_MAP_VIEW.getMap();
+    const mapProj = olMap.getView().getProjection();
+
+    const features = new ol.format.GeoJSON().readFeatures(
+        data.geojson,
+        { dataProjection: 'EPSG:4326', featureProjection: mapProj }
+    );
+    const newSource = new ol.source.Vector({ features: features });
+    var featrs;
+    olMap.getLayers().forEach(layer => {
+
+        if (layer instanceof ol.layer.Vector) {
+
+            layer.setSource(newSource);
+            inject_map_data(layer, data.metadata);
+            featrs = layer.getSource().getFeatures();
+            for (let feature of featrs) {
+                let color = setFeatureColor(feature);
+                let style = new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: color,
+                    }),
+                });
+                feature.setStyle(style);
+            }
+            const extent = newSource.getExtent();
+            if (!ol.extent.isEmpty(extent)) {
+                olMap.getView().fit(extent, { padding: [40, 40, 40, 40], duration: 500 });
+            }
+        }
+        
+    });
+
+
+  })
+  .catch(err => console.error('REST call failed:', err))
+  .finally(() => {
+    // Hide loading message when finished
+    loadingDiv.style.display = 'none';
+  });
 }
