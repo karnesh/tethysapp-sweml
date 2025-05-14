@@ -1,6 +1,5 @@
 {% extends "tethys_layouts/map_layout/map_layout.html" %}
-{% load static %}
-{% load tethys_gizmos %}
+{% load static tethys_gizmos %}
 
 {% block content_dependent_styles %}
   {{ block.super }}
@@ -18,9 +17,9 @@
     <p>Select from the dropdown below to view SWE predictions and an interactive map.</p>
 
     
-    <div>{% gizmo SelectInput model_id %}</div>
+    {% gizmo SelectInput model_id %}
     <div id="region-id-div" style="width:100%">{% gizmo SelectInput region_id %}</div>
-    <div>{% gizmo date_picker date_picker %}</div>
+    {% gizmo date_picker date_picker %}
     <br/>
     <button type="submit" class="btn btn-success">
       <span class="glyphicon glyphicon-play"></span> Update Map

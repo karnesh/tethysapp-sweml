@@ -73,7 +73,6 @@ class swe(MapLayout):
     show_properties_popup = True
     plot_slide_sheet = True
     template_name = "sweml/swe.html"
-    show_legends = True
 
     def get_context(self, request, *args, **kwargs):
         """
@@ -114,7 +113,7 @@ class swe(MapLayout):
                 'placeholder': 'Select a model',
                 'allowClear': True
             },
-            attributes={"onchange": "regionSelectionVisibility();", "id": "model_id"}
+            # attributes={"onchange": "regionSelectionVisibility();", "id": "model_id"}
         )
 
         region_id = SelectInput(
@@ -144,13 +143,10 @@ class swe(MapLayout):
         Add layers to the MapLayout and create associated layer group objects.
         """
         # http request for user inputs
-        model_id = request.GET.get("model_id")
-        # if model_id == "SWEML_regionalv1.0":
-        #     region_id = request.GET.get("region_id")
-        date = request.GET.get("date")
+        model_id = request.GET.get("model_id", "SWEMLv1.0")
+        region_id=request.GET.get("region_id","Tuolumne Basin")
+        date = request.GET.get("date",datetime.datetime.today().strftime('%Y-%m-%d') )
 
-        if not date:
-            date = datetime.datetime.today().strftime('%Y-%m-%d')
 
         # set AWS path for GeoJSON files
         if model_id == "SWEMLv1.0":
@@ -161,7 +157,6 @@ class swe(MapLayout):
                 year = int(date[0:4]) - 1
             else:
                 year = date[0:4]
-            region_id = request.GET.get("region_id")
             s3_geojson_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/GeoJSON"
             layer_name = f"SWE_{region_id}"
         
@@ -203,8 +198,10 @@ class swe(MapLayout):
                     ],
                 )
             ]
+        
 
         except:
+            layer_name = "SWE"
             swe_geojson = {
                 "type": "FeatureCollection",
                 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
@@ -220,7 +217,6 @@ class swe(MapLayout):
                 plottable=True,
                 show_legend=True,
             )
-
             # Create layer groups
             layer_groups = [
                 self.build_layer_group(
@@ -235,6 +231,7 @@ class swe(MapLayout):
 
             messages.error(request, mark_safe("SWE prediction not available for selected date. <br/> Select a "
                                               "different date"))
+        print(layer_name)
 
         return layer_groups
 
@@ -263,8 +260,6 @@ class swe(MapLayout):
         Returns:
             str, list<dict>, dict: plot title, data series, and layout options, respectively.
         """
-
-        # Get the feature id
         x = feature_props.get("x")
         y = feature_props.get("y")
         date = datetime.datetime.strptime(layer_data["popup_title"], "%Y-%m-%d")
@@ -320,17 +315,11 @@ class swe(MapLayout):
         
         data = request.POST or request.json()
         request.session['model_id'] = data.get('model_id')
-        request.session['date'] = data.get('date')
-        request.session['region_id'] = data.get('region_id', "")
-        
-        # http request for user inputs
-        model_id = request.session['model_id']
-        # if model_id == "SWEML_regionalv1.0":
-        #     region_id = request.session['region_id']
-        date =  request.session['date']
+        request.session['date'] = data.get('date', datetime.datetime.today().strftime('%Y-%m-%d'))
+        request.session['region_id'] = data.get('region_id')
 
-        if not date:
-            date = datetime.datetime.today().strftime('%Y-%m-%d')
+        model_id = request.session['model_id']
+        date =  request.session['date']
 
         # set AWS path for GeoJSON files
         if model_id == "SWEMLv1.0":
@@ -341,7 +330,7 @@ class swe(MapLayout):
                 year = int(date[0:4]) - 1
             else:
                 year = date[0:4]
-            region_id = request.session['region_id']                
+            region_id = request.session['region_id'] 
             s3_geojson_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/GeoJSON"
             layer_name = f"SWE_{region_id}"
 
@@ -377,6 +366,7 @@ class swe(MapLayout):
         except:
             messages.error(request, mark_safe("SWE prediction not available for selected date. <br/> Select a "
                                               "different date"))
+            layer_name = "SWE"            
             swe_geojson = {
                 "type": "FeatureCollection",
                 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },

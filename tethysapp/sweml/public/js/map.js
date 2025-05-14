@@ -166,14 +166,13 @@ function updateData(event) {
         { dataProjection: 'EPSG:4326', featureProjection: mapProj }
     );
     const newSource = new ol.source.Vector({ features: features });
-    var featrs;
     olMap.getLayers().forEach(layer => {
 
         if (layer instanceof ol.layer.Vector) {
 
             layer.setSource(newSource);
             inject_map_data(layer, data.metadata);
-            featrs = layer.getSource().getFeatures();
+            var featrs = layer.getSource().getFeatures();
             for (let feature of featrs) {
                 let color = setFeatureColor(feature);
                 let style = new ol.style.Style({

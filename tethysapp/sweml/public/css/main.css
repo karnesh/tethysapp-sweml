@@ -36,3 +36,7 @@
  #region-id-div{
     display:none;
  }
+
+.map-tabs {
+    height: fit-content !important;
+}
