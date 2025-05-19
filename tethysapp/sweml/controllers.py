@@ -147,22 +147,26 @@ class swe(MapLayout):
         region_id=request.GET.get("region_id","Tuolumne Basin")
         date = request.GET.get("date",datetime.datetime.today().strftime('%Y-%m-%d') )
 
+        layer_name = "SWE"
+        layer_title = "SWE"
 
         # set AWS path for GeoJSON files
         if model_id == "SWEMLv1.0":
             s3_geojson_directory = "Neural_Network/Hold_Out_Year/Daily/GeoJSON"
-            layer_name = "SWE"
+            # layer_title = "SWE"
         else:
             if int(date[5:7]) < 10:
                 year = int(date[0:4]) - 1
             else:
                 year = date[0:4]
             s3_geojson_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/GeoJSON"
-            layer_name = f"SWE_{region_id}"
+            layer_title = f"SWE_{region_id}"
         
         try:
             file = f"SWE_{date}.geojson"
             file_path = f"{s3_geojson_directory}/{file}"
+
+
             file_object = s3.Object(BUCKET_NAME, file_path)
             file_content = file_object.get()["Body"].read().decode("utf-8")
             swe_geojson = json.loads(file_content)
@@ -179,7 +183,7 @@ class swe(MapLayout):
             swe_layer = self.build_geojson_layer(
                 geojson=swe_geojson,
                 layer_name=layer_name,
-                layer_title=layer_name,
+                layer_title=layer_title,
                 layer_variable="swe",
                 visible=True,
                 selectable=True,
@@ -210,7 +214,7 @@ class swe(MapLayout):
             swe_layer = self.build_geojson_layer(
                 geojson=swe_geojson,
                 layer_name=layer_name,
-                layer_title=layer_name,
+                layer_title=layer_title,
                 layer_variable="swe",
                 visible=True,
                 selectable=True,
@@ -258,6 +262,7 @@ class swe(MapLayout):
         """
         x = feature_props.get("x")
         y = feature_props.get("y")
+
         date = datetime.datetime.strptime(request.session['date'], "%Y-%m-%d")
         if date.month >= 10:
             start_date = pd.to_datetime(datetime.date(date.year, 10, 1))
@@ -274,38 +279,44 @@ class swe(MapLayout):
             if layer_name == "SWE":
                 csv_directory = "Neural_Network/Hold_Out_Year/Daily/csv"
             else:
-                region_id = layer_name[4:]
+                region_id = request.session['region_id']
+                # region_id = layer_name[4:]
                 year = start_date.year
                 csv_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/csv"
 
-            file = f"swe_1000m_{y:.3f}_{x:.3f}.csv"
-            file_path = f"{csv_directory}/{file}"
-            file_object = s3.Object(BUCKET_NAME, file_path)
-            file_content = file_object.get()["Body"]
+            try:
+                file = f"swe_1000m_{y:.3f}_{x:.3f}.csv"
+                file_path = f"{csv_directory}/{file}"
+                file_object = s3.Object(BUCKET_NAME, file_path)
+                file_content = file_object.get()["Body"]
 
-            if not file_content:
+                if not file_content:
+                    print(f"WARNING: no such file {file_path}")
+                    return f"No Data Found for SWE at Lat: {y:.3f} Lon: {x:.3f}", [], layout
+
+                # Parse with Pandas
+                df = pd.read_csv(file_content)
+                df.date = pd.to_datetime(df.date)
+                if layer_name == "SWE":
+                    mask = (df["date"] > start_date) & (df["date"] <= end_date)
+                    df = df.loc[mask]
+                time_col = df.iloc[:, 0]
+                swe_col = df.iloc[:, 1]
+                data = [
+                    {
+                        "name": "SWE",
+                        "mode": "lines",
+                        "x": time_col.tolist(),
+                        "y": swe_col.tolist(),
+                        "line": {"width": 2, "color": "blue"},
+                    },
+                ]
+                return f"SWE at Lat: {y:.3f} Lon: {x:.3f}", data, layout
+
+            except Exception as e:
                 print(f"WARNING: no such file {file_path}")
+                print(e)
                 return f"No Data Found for SWE at Lat: {y:.3f} Lon: {x:.3f}", [], layout
-
-            # Parse with Pandas
-            df = pd.read_csv(file_content)
-            df.date = pd.to_datetime(df.date)
-            if layer_name == "SWE":
-                mask = (df["date"] > start_date) & (df["date"] <= end_date)
-                df = df.loc[mask]
-            time_col = df.iloc[:, 0]
-            swe_col = df.iloc[:, 1]
-            data = [
-                {
-                    "name": "SWE",
-                    "mode": "lines",
-                    "x": time_col.tolist(),
-                    "y": swe_col.tolist(),
-                    "line": {"width": 2, "color": "blue"},
-                },
-            ]
-
-            return f"SWE at Lat: {y:.3f} Lon: {x:.3f}", data, layout
 
     def update_sweml_data(self, request, *args, **kwargs):
         
@@ -316,21 +327,22 @@ class swe(MapLayout):
 
         model_id = request.session['model_id']
         date =  request.session['date']
+        layer_name = "SWE"
 
         # set AWS path for GeoJSON files
         if model_id == "SWEMLv1.0":
             s3_geojson_directory = "Neural_Network/Hold_Out_Year/Daily/GeoJSON"
-            layer_name = "SWE"
         else:
             if int(date[5:7]) < 10:
                 year = int(date[0:4]) - 1
             else:
                 year = date[0:4]
-            region_id = request.session['region_id'] 
+            region_id = request.session['region_id']
             s3_geojson_directory = f"SWEMLv1Regional/{region_id}/{year}/Data/GeoJSON"
-            layer_name = f"SWE_{region_id}"
+            # layer_name = f"SWE_{region_id}"
 
         try:
+            
             file = f"SWE_{date}.geojson"
             file_path = f"{s3_geojson_directory}/{file}"
             file_object = s3.Object(BUCKET_NAME, file_path)

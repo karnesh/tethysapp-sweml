@@ -84,7 +84,6 @@ function createColorGradient(color_dict) {
 }
     
 function regionSelectionVisibility(){
-  console.log("regionSelectionVisibility");
     // Get the selected model ID
     let model_id = document.getElementById("model_id").value;
     let region_id = document.getElementById("region-id-div");
@@ -159,7 +158,7 @@ function updateData(event) {
   })
   .then(resp => resp.ok ? resp.json() : Promise.reject(resp))
   .then(data => {
-    
+    console.log('Server response:', data);
     if (!data.success) {
       console.error('Error in server response:', data);
       errorDiv.style.display = 'block';
