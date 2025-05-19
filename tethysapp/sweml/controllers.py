@@ -291,15 +291,21 @@ class swe(MapLayout):
                 file_content = file_object.get()["Body"]
 
                 if not file_content:
-                    print(f"WARNING: no such file {file_path}")
+                    logging.warning(f"WARNING: no such file {file_path}")
                     return f"No Data Found for SWE at Lat: {y:.3f} Lon: {x:.3f}", [], layout
 
                 # Parse with Pandas
+
+
                 df = pd.read_csv(file_content)
+                
                 df.date = pd.to_datetime(df.date)
                 if layer_name == "SWE":
                     mask = (df["date"] > start_date) & (df["date"] <= end_date)
                     df = df.loc[mask]
+                if df.empty:
+                    logging.warning(f"WARNING: no such file {file_path}")
+                    return f"No Data Found for SWE at Lat: {y:.3f} Lon: {x:.3f}", [], layout
                 time_col = df.iloc[:, 0]
                 swe_col = df.iloc[:, 1]
                 data = [
@@ -312,7 +318,10 @@ class swe(MapLayout):
                     },
                 ]
                 return f"SWE at Lat: {y:.3f} Lon: {x:.3f}", data, layout
-
+            
+            except pd.errors.EmptyDataError:
+                logging.warning(f"WARNING: no such file {file_path}")
+                return f"No Data Found for SWE at Lat: {y:.3f} Lon: {x:.3f}", [], layout
             except Exception as e:
                 print(f"WARNING: no such file {file_path}")
                 print(e)
