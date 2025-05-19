@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 from tethys_sdk.layouts import MapLayout
 from tethys_sdk.routing import controller
-from django.contrib import messages
+
 from django.http import JsonResponse
 
 from django.utils.safestring import mark_safe
@@ -29,8 +29,8 @@ csv_path = resources.files('tethysapp.sweml').joinpath('AWSaccessKeys.csv')
 
 if not os.path.exists(csv_path):
     logging.warning(f"File {csv_path} does not exist. Using environment variables instead.")
-    SWEML_AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-    SWEML_AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    SWEML_AWS_ACCESS_KEY_ID = os.environ.get('SWEML_AWS_ACCESS_KEY_ID')
+    SWEML_AWS_SECRET_ACCESS_KEY = os.environ.get('SWEML_AWS_SECRET_ACCESS_KEY')
 
 else:
     logging.warning(f"File {csv_path} exists. Using it to load AWS access keys.")
@@ -113,7 +113,7 @@ class swe(MapLayout):
                 'placeholder': 'Select a model',
                 'allowClear': True
             },
-            # attributes={"onchange": "regionSelectionVisibility();", "id": "model_id"}
+            attributes={"onchange": "regionSelectionVisibility();", "id": "model_id"}
         )
 
         region_id = SelectInput(
@@ -228,10 +228,6 @@ class swe(MapLayout):
                     ],
                 )
             ]
-
-            messages.error(request, mark_safe("SWE prediction not available for selected date. <br/> Select a "
-                                              "different date"))
-        print(layer_name)
 
         return layer_groups
 
@@ -364,8 +360,6 @@ class swe(MapLayout):
             return JsonResponse({'success': True,'metadata': swe_layer ,'geojson': swe_geojson})
 
         except:
-            messages.error(request, mark_safe("SWE prediction not available for selected date. <br/> Select a "
-                                              "different date"))
             layer_name = "SWE"            
             swe_geojson = {
                 "type": "FeatureCollection",

@@ -84,6 +84,8 @@ function createColorGradient(color_dict) {
 }
     
 function regionSelectionVisibility(){
+  console.log("regionSelectionVisibility");
+    // Get the selected model ID
     let model_id = document.getElementById("model_id").value;
     let region_id = document.getElementById("region-id-div");
     if (model_id === "SWEML_regionalv1.0"){
@@ -119,6 +121,8 @@ $(function() {
 });
 
 
+
+// document.getElementById('model_id').addEventListener('change', regionSelectionVisibility);
 
 
 
